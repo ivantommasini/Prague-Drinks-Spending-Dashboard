@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Prague Night Out Costs</title>
+<style>
+:root{--bg:#0b0d12;--card:#1a2230;--card2:#141a25;--line:#2c3748;--text:#f4f6fa;--mute:#9aa7ba;--gold:#f5b84b;--teal:#7fd8be;--green:#3ddc84}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.4}
+.wrap{max-width:820px;margin:0 auto;padding:16px}
+.hero{background:var(--card2);border-radius:24px;padding:22px 18px}
+.eyebrow{color:var(--gold);font-weight:700;font-size:13px;letter-spacing:.02em;text-transform:uppercase}
+h1{font-size:clamp(28px,7vw,44px);margin:10px 0 8px;line-height:1.1}
+.sub{color:var(--mute);margin:0 0 16px}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.kpi{background:var(--card);border-radius:16px;padding:14px 12px}
+.kpi b{display:block;color:var(--gold);font-size:clamp(17px,4.6vw,28px)}
+.kpi span{color:var(--mute);font-size:13px}
+.tabs{display:flex;gap:8px;overflow-x:auto;padding:4px 0 12px;scrollbar-width:none}
+.tab{border:0;background:var(--card);color:var(--text);padding:10px 16px;border-radius:999px;font-weight:600;font-size:14px;white-space:nowrap;cursor:pointer}
+.tab.on{background:rgba(61,220,132,.15);color:var(--green)}
+.panel{display:none}.panel.on{display:block}
+.card{background:var(--card);border-radius:18px;padding:18px;margin-bottom:14px}
+.card h2{margin:0 0 14px;font-size:20px}
+.row{margin-bottom:16px}
+.row .l{display:flex;justify-content:space-between;font-weight:600;margin-bottom:6px}
+.row .l em{font-style:normal;color:var(--gold)}
+.track{position:relative;height:10px;background:#2f3a4d;border-radius:99px;overflow:hidden}
+.fill{height:100%;background:var(--teal);border-radius:99px;transition:width .4s}
+.range{position:relative;height:10px;background:#2f3a4d;border-radius:99px}
+.range i{position:absolute;top:0;height:100%;background:rgba(127,216,190,.45);border-radius:99px}
+.range u{position:absolute;top:-3px;width:4px;height:16px;background:var(--gold);border-radius:2px}
+.small{color:var(--mute);font-size:12px;margin-top:4px;display:flex;justify-content:space-between}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:right;padding:10px 6px;border-bottom:1px solid var(--line)}
+th:first-child,td:first-child{text-align:left}
+th{color:var(--mute);font-weight:600;font-size:12px}
+tr.hl td{color:var(--gold);font-weight:700}
+label{display:block;font-weight:600;margin:14px 0 6px;font-size:14px}
+label span{float:right;color:var(--gold)}
+input[type=range]{width:100%;accent-color:var(--teal)}
+select,input[type=number]{width:100%;background:var(--card2);color:var(--text);border:1px solid var(--line);border-radius:12px;padding:12px;font-size:16px}
+.seg{display:flex;gap:6px;margin-top:6px}
+.seg button{flex:1;padding:10px;border-radius:12px;border:1px solid var(--line);background:var(--card2);color:var(--text);font-weight:600;cursor:pointer}
+.seg button.on{background:var(--teal);color:#06231a;border-color:var(--teal)}
+.res{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:18px}
+.res div{background:var(--card2);border-radius:14px;padding:12px}
+.res b{display:block;color:var(--gold);font-size:20px}.res span{color:var(--mute);font-size:12px}
+.btn{background:var(--teal);color:#06231a;border:0;border-radius:12px;padding:12px 16px;font-weight:700;font-size:14px;cursor:pointer;margin:6px 8px 0 0}
+.note{color:var(--mute);font-size:12px;margin:14px 4px 30px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="hero">
+  <div class="eyebrow">Prague · Drinks &amp; Nightlife Economics</div>
+  <h1>What does a night out really cost?</h1>
+  <p class="sub">An interactive dashboard of Prague drink prices and nightlife spending.</p>
+  <div class="kpis">
+    <div class="kpi"><b id="k1"></b><span>Price per drink</span></div>
+    <div class="kpi"><b id="k2"></b><span>Monthly regular spend</span></div>
+    <div class="kpi"><b id="k3"></b><span>Annual regular spend</span></div>
+  </div>
+  <div class="tabs" id="tabs">
+    <button class="tab on" data-p="overview">Overview</button>
+    <button class="tab" data-p="prices">Drink prices</button>
+    <button class="tab" data-p="scen">Spending scenarios</button>
+    <button class="tab" data-p="calc">Your calculator</button>
+  </div>
+
+  <div class="panel on" id="overview">
+    <div class="card"><h2>Typical drink prices</h2><div id="ovBars"></div></div>
+    <div class="card"><h2>Baseline: “Regular” night out</h2>
+      <p class="sub" style="margin:0">4 drinks × 120 Kč × 2 nights a week, no other spending.</p>
+      <div class="res">
+        <div><b id="bw"></b><span>Weekly</span></div>
+        <div><b id="bm"></b><span>Monthly</span></div>
+        <div><b id="ba"></b><span>Annual</span></div>
+        <div><b id="be"></b><span>Annual in EUR</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" id="prices">
+    <div class="card"><h2>Price range per drink</h2><div id="rangeBars"></div>
+      <div class="small"><span>Marker = average</span><span>Shaded = low → high</span></div></div>
+    <div class="card"><table id="priceTbl"></table></div>
+  </div>
+
+  <div class="panel" id="scen">
+    <div class="card"><h2>Lifestyle scenarios</h2><div id="scBars"></div></div>
+    <div class="card"><div style="overflow-x:auto"><table id="scTbl"></table></div></div>
+  </div>
+
+  <div class="panel" id="calc">
+    <div class="card"><h2>Your calculator</h2>
+      <label>Drink type</label>
+      <select id="pick"></select>
+      <label>Drinks per night <span id="v1"></span></label><input id="i1" type="range" min="1" max="12" value="4">
+      <label>Price per drink (Kč) <span id="v2"></span></label><input id="i2" type="range" min="30" max="400" step="5" value="120">
+      <label>Nights per week <span id="v3"></span></label><input id="i3" type="range" min="0" max="7" value="2">
+      <label>Other spending per night (Kč)</label><input id="i4" type="number" min="0" value="0" inputmode="numeric">
+      <label>Currency</label>
+      <div class="seg"><button data-c="CZK" class="on">CZK</button><button data-c="EUR">EUR</button></div>
+      <div class="res">
+        <div><b id="rn"></b><span>Per night</span></div>
+        <div><b id="rw"></b><span>Weekly</span></div>
+        <div><b id="rm"></b><span>Monthly</span></div>
+        <div><b id="ra"></b><span>Annual</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Export data</h2>
+    <button class="btn" onclick="dl('csv')">Download CSV</button>
+    <button class="btn" onclick="dl('json')">Download JSON</button>
+  </div>
+</div>
+<p class="note">All spending figures are estimates, not official survey averages. Monthly = weekly × 4.33. Exchange rate: 25 Kč per €1.</p>
+</div>
+
+<script>
+const RATE=25, WPM=4.33;
+const drinks=[
+ {n:"Beer",avg:67.5,lo:45,hi:90},
+ {n:"Wine",avg:112.5,lo:75,hi:150},
+ {n:"Aperol Spritz",avg:157.5,lo:120,hi:195},
+ {n:"Premium Cocktail",avg:250,lo:180,hi:300}];
+const scen=[
+ {n:"Occasional",d:2,w:1,p:100},
+ {n:"Social",d:3,w:1,p:120},
+ {n:"Regular",d:4,w:2,p:120},
+ {n:"Frequent",d:5,w:3,p:150}].map(s=>{s.wk=s.d*s.w*s.p;s.mo=+(s.wk*WPM).toFixed(1);s.yr=s.wk*52;return s});
+const base=scen[2];
+const f=n=>Math.round(n).toLocaleString("en-US")+" Kč";
+const $=id=>document.getElementById(id);
+
+$("k1").textContent="45–300 Kč";
+$("k2").textContent=f(base.mo);
+$("k3").textContent=f(base.yr);
+$("bw").textContent=f(base.wk);$("bm").textContent=f(base.mo);$("ba").textContent=f(base.yr);
+$("be").textContent="€"+Math.round(base.yr/RATE).toLocaleString("en-US");
+
+const maxA=Math.max(...drinks.map(d=>d.avg));
+$("ovBars").innerHTML=drinks.map(d=>`<div class="row"><div class="l"><span>${d.n}</span><em>${d.avg} Kč</em></div><div class="track"><div class="fill" style="width:${d.avg/maxA*100}%"></div></div></div>`).join("");
+
+const maxH=Math.max(...drinks.map(d=>d.hi));
+$("rangeBars").innerHTML=drinks.map(d=>`<div class="row"><div class="l"><span>${d.n}</span><em>${d.lo}–${d.hi} Kč</em></div><div class="range"><i style="left:${d.lo/maxH*100}%;width:${(d.hi-d.lo)/maxH*100}%"></i><u style="left:calc(${d.avg/maxH*100}% - 2px)"></u></div></div>`).join("");
+$("priceTbl").innerHTML="<tr><th>Drink</th><th>Low</th><th>Average</th><th>High</th></tr>"+drinks.map(d=>`<tr><td>${d.n}</td><td>${d.lo}</td><td>${d.avg}</td><td>${d.hi}</td></tr>`).join("");
+
+const maxY=Math.max(...scen.map(s=>s.yr));
+$("scBars").innerHTML=scen.map(s=>`<div class="row"><div class="l"><span>${s.n}</span><em>${f(s.yr)} / yr</em></div><div class="track"><div class="fill" style="width:${s.yr/maxY*100}%"></div></div><div class="small"><span>${s.d} drinks × ${s.w} night${s.w>1?"s":""} × ${s.p} Kč</span><span>${f(s.mo)} / mo</span></div></div>`).join("");
+$("scTbl").innerHTML="<tr><th>Lifestyle</th><th>Drinks</th><th>Nights</th><th>Price</th><th>Weekly</th><th>Monthly</th><th>Annual</th></tr>"+scen.map(s=>`<tr class="${s===base?"hl":""}"><td>${s.n}</td><td>${s.d}</td><td>${s.w}</td><td>${s.p}</td><td>${f(s.wk)}</td><td>${f(s.mo)}</td><td>${f(s.yr)}</td></tr>`).join("");
+
+// calculator
+let cur="CZK";
+$("pick").innerHTML='<option value="">Custom price</option>'+drinks.map(d=>`<option value="${d.avg}">${d.n} (${d.avg} Kč)</option>`).join("");
+const fm=n=>cur==="EUR"?"€"+(n/RATE).toLocaleString("en-US",{maximumFractionDigits:0}):f(n);
+function calc(){
+  const d=+$("i1").value,p=+$("i2").value,w=+$("i3").value,o=+$("i4").value||0;
+  $("v1").textContent=d;$("v2").textContent=p+" Kč";$("v3").textContent=w;
+  const night=d*p+o,wk=night*w;
+  $("rn").textContent=fm(night);$("rw").textContent=fm(wk);$("rm").textContent=fm(wk*WPM);$("ra").textContent=fm(wk*52);
+}
+["i1","i2","i3","i4"].forEach(i=>$(i).addEventListener("input",calc));
+$("pick").onchange=e=>{if(e.target.value){$("i2").value=e.target.value;calc()}};
+$("i2").addEventListener("input",()=>$("pick").value="");
+document.querySelectorAll(".seg button").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll(".seg button").forEach(x=>x.classList.remove("on"));
+  b.classList.add("on");cur=b.dataset.c;calc();
+});
+calc();
+
+// tabs
+document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{
+  document.querySelectorAll(".tab").forEach(x=>x.classList.remove("on"));
+  document.querySelectorAll(".panel").forEach(x=>x.classList.remove("on"));
+  t.classList.add("on");$(t.dataset.p).classList.add("on");
+});
+
+// export
+function dl(type){
+  let out,mime;
+  if(type==="json"){
+    out=JSON.stringify({exchange_rate_czk_per_eur:RATE,weeks_per_month:WPM,drinks:drinks.map(d=>({drink:d.n,average_czk:d.avg,low_czk:d.lo,high_czk:d.hi})),scenarios:scen.map(s=>({lifestyle:s.n,drinks_per_night:s.d,nights_per_week:s.w,price_per_drink:s.p,weekly_czk:s.wk,monthly_czk:s.mo,annual_czk:s.yr}))},null,2);
+    mime="application/json";
+  }else{
+    out="Drink,Average_Price_CZK,Low_CZK,High_CZK\n"+drinks.map(d=>[d.n,d.avg,d.lo,d.hi].join(",")).join("\n")+
+    "\n\nLifestyle,Drinks_Per_Night,Nights_Per_Week,Price_Per_Drink,Weekly_CZK,Monthly_CZK,Annual_CZK\n"+
+    scen.map(s=>[s.n,s.d,s.w,s.p,s.wk,s.mo,s.yr].join(",")).join("\n");
+    mime="text/csv";
+  }
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([out],{type:mime}));
+  a.download="prague-night-out."+type;a.click();
+}
+</script>
+</body>
+</html>
