@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Prague Drinks & Spending | Data Dashboard</title>
+<style>
+:root{--bg:#10151d;--panel:#1a2430;--panel2:#222f3d;--ink:#f4f6f8;--muted:#aebbc7;--line:#344454;--gold:#e8bd72;--mint:#82d6bd}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top right,#263342 0,#10151d 48%);color:var(--ink);font:15px/1.55 Inter,system-ui,Segoe UI,Arial,sans-serif}
+header{padding:46px max(20px,calc((100vw - 1120px)/2)) 34px;border-bottom:1px solid var(--line)}
+.kicker{color:var(--gold);text-transform:uppercase;letter-spacing:.17em;font-size:11px;font-weight:800}
+h1{font-size:clamp(34px,6vw,58px);line-height:1.02;margin:13px 0 12px;max-width:850px}
+header p{color:var(--muted);max-width:760px;margin:0}
+main{max-width:1120px;margin:auto;padding:26px 20px 60px}
+nav{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+nav button,.btn{border:1px solid var(--line);border-radius:999px;background:var(--panel);color:var(--ink);padding:9px 15px;cursor:pointer;font:inherit}
+nav button.active,nav button:hover,.btn.primary{background:var(--gold);color:#1b2026;border-color:var(--gold);font-weight:700}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.card,.section{background:rgba(26,36,48,.94);border:1px solid var(--line);border-radius:16px;padding:19px}
+.metric{font-size:30px;font-weight:800;color:var(--gold);letter-spacing:-.04em}.label{color:var(--muted);font-size:13px}
+.section{margin-top:18px}.section h2{margin:0 0 4px;font-size:23px}.sub{margin:0 0 17px;color:var(--muted);font-size:13px}
+.tablewrap{overflow-x:auto}table{border-collapse:collapse;width:100%;min-width:520px}th,td{text-align:left;padding:11px 12px;border-bottom:1px solid var(--line)}th{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em}td{font-size:14px}
+.barlist{display:grid;gap:14px}.barrow{display:grid;grid-template-columns:150px 1fr 90px;gap:12px;align-items:center}.track{height:11px;background:#344454;border-radius:30px;overflow:hidden}.fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--mint));border-radius:30px}
+.controls{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:15px}
+label{display:block;color:var(--muted);font-size:12px;margin-bottom:5px}input,select{width:100%;padding:10px 11px;border-radius:9px;border:1px solid var(--line);background:var(--panel2);color:var(--ink);font:inherit}
+.result{background:#263545;border:1px solid #506071;border-radius:13px;padding:15px;margin-top:14px;display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.result strong{display:block;font-size:24px;color:var(--mint)}
+.note{margin-top:14px;padding:12px 14px;border-left:3px solid var(--gold);background:#252f3b;border-radius:7px;color:#d3dbe2;font-size:13px}
+.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}.fine{color:var(--muted);font-size:12px;margin-top:28px}
+[hidden]{display:none!important}
+@media(max-width:720px){.grid{grid-template-columns:1fr}.controls{grid-template-columns:1fr}.barrow{grid-template-columns:105px 1fr 75px;gap:8px;font-size:12px}.result{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<header>
+<div class="kicker">Prague • Drinks & nightlife economics</div>
+<h1>What does a night out really cost?</h1>
+<p>An interactive dashboard of indicative Prague drink prices and editable spending scenarios. Explore the numbers, adjust your habits and export the data for your own infographic.</p>
+</header>
+<main>
+<nav aria-label="Dashboard sections">
+<button class="active" data-tab="overview">Overview</button>
+<button data-tab="prices">Drink prices</button>
+<button data-tab="spending">Spending scenarios</button>
+<button data-tab="calculator">Your calculator</button>
+</nav>
+
+<section id="overview">
+<div class="grid">
+<div class="card"><div class="metric">55–300 Kč</div><div class="label">Indicative price range per drink</div></div>
+<div class="card"><div class="metric">1,920 Kč</div><div class="label">Regular scenario monthly spend</div></div>
+<div class="card"><div class="metric">23,040 Kč</div><div class="label">Regular scenario annual spend</div></div>
+</div>
+<div class="section">
+<h2>Typical drink prices</h2><p class="sub">Indicative price midpoint by drink, in Czech koruna</p>
+<div id="overviewBars" class="barlist"></div>
+<div class="note">Prices are planning estimates, not a verified survey of Prague venues. Actual prices vary by neighbourhood, venue, serving size and date.</div>
+</div>
+<div class="section">
+<h2>Spending profiles</h2><p class="sub">Illustrative examples based on drinks per night, nights out per month and assumed average price per drink.</p>
+<div class="tablewrap"><table id="overviewTable"></table></div>
+</div>
+</section>
+
+<section id="prices" hidden>
+<div class="section">
+<h2>Prague drink price database</h2><p class="sub">Edit or export this indicative reference list for your infographic.</p>
+<div class="tablewrap"><table id="priceTable"></table></div>
+<div class="actions"><button class="btn primary" id="exportPrices">Export drink prices CSV</button></div>
+<div class="note">These price ranges are indicative estimates carried over from the planning discussion; they should be checked against current menus before publication.</div>
+</div>
+</section>
+
+<section id="spending" hidden>
+<div class="section">
+<h2>Monthly and annual spending</h2><p class="sub">Compare four example drinking patterns.</p>
+<div class="barlist" id="spendBars"></div>
+<div class="tablewrap"><table id="scenarioTable"></table></div>
+<div class="actions"><button class="btn primary" id="exportScenarios">Export spending scenarios CSV</button><button class="btn" id="exportAll">Export all data JSON</button></div>
+<div class="note">These are scenarios, not measured average spending by Prague residents. Annual figures assume the same pattern for all 12 months.</div>
+</div>
+</section>
+
+<section id="calculator" hidden>
+<div class="section">
+<h2>Calculate your own spending</h2><p class="sub">Change the assumptions to model a night out, month or year.</p>
+<div class="controls">
+<div><label for="drinks">Drinks per night</label><input id="drinks" type="number" min="0" step="1" value="4"></div>
+<div><label for="nights">Nights out per month</label><input id="nights" type="number" min="0" step="1" value="4"></div>
+<div><label for="price">Average price per drink (Kč)</label><input id="price" type="number" min="0" step="5" value="120"></div>
+</div>
+<div class="result">
+<div><span class="label">Per night</span><strong id="nightResult">480 Kč</strong></div>
+<div><span class="label">Per month</span><strong id="monthResult">1,920 Kč</strong></div>
+<div><span class="label">Per year</span><strong id="yearResult">23,040 Kč</strong></div>
+<div><span class="label">Drinks per year</span><strong id="countResult">192</strong></div>
+</div>
+<div class="note">This is a spending calculator only. It does not estimate health effects or recommend a level of alcohol consumption.</div>
+</div>
+</section>
+
+<p class="fine">Currency: CZK. Geographic scope: Prague, Czech Republic. Data classification: indicative price estimates and illustrative scenarios, not official population statistics.</p>
+</main>
+<script>
+const DATA = {"drinks": [{"drink": "Beer", "serving": "0.5 L", "low": 55, "high": 80, "mid": 67.5}, {"drink": "Wine", "serving": "150–200 ml", "low": 75, "high": 150, "mid": 112.5}, {"drink": "Spirit shot", "serving": "40 ml", "low": 70, "high": 120, "mid": 95}, {"drink": "Aperol Spritz", "serving": "1 glass", "low": 120, "high": 195, "mid": 157.5}, {"drink": "Gin & Tonic", "serving": "1 glass", "low": 120, "high": 195, "mid": 157.5}, {"drink": "Whisky", "serving": "40 ml", "low": 100, "high": 220, "mid": 160}, {"drink": "Rum & Coke", "serving": "1 glass", "low": 130, "high": 220, "mid": 175}, {"drink": "Premium cocktail", "serving": "1 glass", "low": 200, "high": 300, "mid": 250}], "scenarios": [{"profile": "Occasional", "drinks": 2, "nights": 1, "price": 85}, {"profile": "Social", "drinks": 4, "nights": 2, "price": 120}, {"profile": "Regular", "drinks": 4, "nights": 4, "price": 120}, {"profile": "Frequent", "drinks": 6, "nights": 8, "price": 150}]};
+const fmt = n => new Intl.NumberFormat('en-US',{maximumFractionDigits:0}).format(n)+' Kč';
+const scenarios = DATA.scenarios.map(s=>({...s,monthly:s.drinks*s.nights*s.price,annual:s.drinks*s.nights*s.price*12}));
+function table(headers,rows){return '<thead><tr>'+headers.map(h=>'<th>'+h+'</th>').join('')+'</tr></thead><tbody>'+rows.map(row=>'<tr>'+row.map(v=>'<td>'+v+'</td>').join('')+'</tr>').join('')+'</tbody>'}
+function bars(el,items,max){document.getElementById(el).innerHTML=items.map(x=>`<div class="barrow"><span>${x.label}</span><div class="track"><div class="fill" style="width:${Math.max(0,x.value/max*100)}%"></div></div><b>${fmt(x.value)}</b></div>`).join('')}
+bars('overviewBars',DATA.drinks.map(d=>({label:d.drink,value:d.mid})),300);
+document.getElementById('overviewTable').innerHTML=table(['Profile','Drinks/night','Nights/month','Monthly spend','Annual spend'],scenarios.map(s=>[s.profile,s.drinks,s.nights,fmt(s.monthly),fmt(s.annual)]));
+document.getElementById('priceTable').innerHTML=table(['Drink','Serving','Low (Kč)','High (Kč)','Midpoint (Kč)'],DATA.drinks.map(d=>[d.drink,d.serving,d.low,d.high,d.mid]));
+document.getElementById('scenarioTable').innerHTML=table(['Profile','Drinks/night','Nights/month','Avg. price/drink','Monthly (Kč)','Annual (Kč)'],scenarios.map(s=>[s.profile,s.drinks,s.nights,s.price,fmt(s.monthly),fmt(s.annual)]));
+bars('spendBars',scenarios.map(s=>({label:s.profile,value:s.monthly})),Math.max(...scenarios.map(s=>s.monthly)));
+document.querySelectorAll('nav button').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('active',x===b));document.querySelectorAll('main section[id]').forEach(s=>s.hidden=s.id!==b.dataset.tab)}));
+function csv(rows){return rows.map(r=>r.map(v=>{let s=String(v??'');return /[",\n\r]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s}).join(',')).join('\r\n')}
+function download(name,content,type){let a=document.createElement('a'),u=URL.createObjectURL(new Blob([content],{type}));a.href=u;a.download=name;a.click();URL.revokeObjectURL(u)}
+document.getElementById('exportPrices').onclick=()=>download('prague_drink_prices.csv',csv([['Drink','Serving','Low price CZK','High price CZK','Midpoint CZK'],...DATA.drinks.map(d=>[d.drink,d.serving,d.low,d.high,d.mid])]),'text/csv;charset=utf-8');
+document.getElementById('exportScenarios').onclick=()=>download('prague_drinking_spending_scenarios.csv',csv([['Profile','Drinks per night','Nights per month','Average price per drink CZK','Monthly spending CZK','Annual spending CZK'],...scenarios.map(s=>[s.profile,s.drinks,s.nights,s.price,s.monthly,s.annual])]),'text/csv;charset=utf-8');
+document.getElementById('exportAll').onclick=()=>download('prague_drinks_data.json',JSON.stringify({drinkPrices:DATA.drinks,spendingScenarios:scenarios},null,2),'application/json');
+function calc(){let d=Math.max(0,+document.getElementById('drinks').value||0),n=Math.max(0,+document.getElementById('nights').value||0),p=Math.max(0,+document.getElementById('price').value||0);document.getElementById('nightResult').textContent=fmt(d*p);document.getElementById('monthResult').textContent=fmt(d*n*p);document.getElementById('yearResult').textContent=fmt(d*n*p*12);document.getElementById('countResult').textContent=new Intl.NumberFormat().format(d*n*12)}
+['drinks','nights','price'].forEach(id=>document.getElementById(id).addEventListener('input',calc));calc();
+</script>
+</body></html>
