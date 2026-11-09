@@ -1,0 +1,1013 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Prague Night Tab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout concept: sticky section rail on the left, one long ledger-style page on the right.
+   The beer-mat tally (čárky) is the single recurring motif; everything else stays quiet. */
+:root{
+  --bg:#0d1015;--surface:#151a22;--surface-2:#1b212b;--line:#262d39;--line-strong:#394253;
+  --text:#eef0f4;--muted:#9aa3b2;--dim:#6b7585;
+  --amber:#eaa63a;--amber-ink:#1a1204;--food:#6ea8e0;--cover:#e07a90;--good:#5ccf9b;--bad:#f0806b;
+  --coaster:#e9dcc0;--coaster-ink:#2a2113;
+  --f-display:'Bricolage Grotesque','Arial Narrow',system-ui,sans-serif;
+  --f-body:'Instrument Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --f-mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --bg:#f2f3f6;--surface:#ffffff;--surface-2:#f6f7f9;--line:#dfe3ea;--line-strong:#c4cad6;
+    --text:#14181f;--muted:#566074;--dim:#7b8496;
+    --amber:#b86f00;--amber-ink:#ffffff;--food:#2c6cb0;--cover:#b44461;--good:#17805a;--bad:#c4432e;
+    color-scheme:light;
+  }
+}
+:root[data-theme="light"]{
+  --bg:#f2f3f6;--surface:#ffffff;--surface-2:#f6f7f9;--line:#dfe3ea;--line-strong:#c4cad6;
+  --text:#14181f;--muted:#566074;--dim:#7b8496;
+  --amber:#b86f00;--amber-ink:#ffffff;--food:#2c6cb0;--cover:#b44461;--good:#17805a;--bad:#c4432e;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--f-body);font-size:15px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--bg)}
+h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:-.01em}
+p{margin:0}
+a{color:var(--amber)}
+:focus-visible{outline:2px solid var(--amber);outline-offset:2px;border-radius:4px}
+.num,table,.rr-v,.br-h b,.kv b{font-variant-numeric:tabular-nums}
+
+/* shell */
+.app{display:grid;grid-template-columns:240px minmax(0,1fr);gap:48px;max-width:1360px;margin:0 auto}
+.rail{position:sticky;top:0;align-self:start;height:100vh;padding:28px 0;display:flex;flex-direction:column;gap:28px}
+.brand{display:flex;flex-direction:column;gap:2px}
+.brand b{font-family:var(--f-display);font-size:22px;font-weight:700}
+.brand span{font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+#nav{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px;overflow-y:auto}
+#nav a{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:8px;color:var(--muted);text-decoration:none;font-size:14px}
+#nav a::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--line-strong);flex:none}
+#nav a:hover{color:var(--text)}
+#nav a.on{color:var(--text);background:var(--surface)}
+#nav a.on::before{background:var(--amber)}
+.readout{margin-top:auto;border-top:1px solid var(--line);padding-top:16px;display:flex;flex-direction:column;gap:2px}
+.readout span{font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.readout b{font-family:var(--f-display);font-size:28px;color:var(--amber)}
+.readout small{color:var(--muted);font-size:12px}
+.main{padding-bottom:80px;min-width:0}
+
+/* sections */
+.sec{padding-block:56px;border-top:1px solid var(--line);scroll-margin-top:0}
+.sec:first-child{border-top:0;padding-top:36px}
+.sec-head{display:grid;gap:10px;margin-bottom:28px;max-width:70ch}
+.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.sec-head h2{font-size:clamp(28px,3.6vw,40px);line-height:1.08;font-weight:700}
+.sec-head p{color:var(--muted);font-size:16px}
+.tag{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:99px;border:1px solid currentColor}
+.t-s{color:var(--good)}.t-m{color:var(--amber)}.t-u{color:var(--food)}
+
+.g2,.g3,.g4{display:grid;gap:16px;min-width:0}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.g21{display:grid;gap:16px;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr)}
+.stack{display:grid;gap:16px;align-content:start;min-width:0}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px;min-width:0}
+.card h3{font-size:18px;font-weight:600;margin-bottom:14px}
+.cap{color:var(--muted);font-size:13px;margin-top:14px}
+.note-box{background:var(--surface-2);border-radius:10px;padding:14px 16px;color:var(--muted);font-size:14px}
+.note-box b{color:var(--text);font-weight:600}
+
+/* hero */
+.hero-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:32px;align-items:start}
+.hero-copy{display:grid;gap:22px;align-content:start}
+.hero-copy h1{font-size:clamp(40px,5.6vw,72px);line-height:1;font-weight:800;letter-spacing:-.025em}
+.lead{font-size:18px;color:var(--muted);max-width:52ch}
+.kpis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px 28px}
+.stat{border-top:2px solid var(--line-strong);padding-top:10px;min-width:0}
+.stat span{font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.stat b{display:block;font-family:var(--f-display);font-size:clamp(26px,3vw,36px);line-height:1.15;color:var(--amber);font-weight:700;overflow-wrap:anywhere}
+.stat small{color:var(--muted);font-size:13px}
+.findings{margin-top:48px}
+.findings .stat b{color:var(--text)}
+
+/* profile panel */
+.profile{display:grid;gap:16px}
+.profile-top{display:flex;gap:16px;align-items:center}
+.profile-top svg{width:132px;height:132px;flex:none}
+.profile-top p{color:var(--muted);font-size:13px}
+.profile-top b{display:block;font-family:var(--f-display);font-size:20px;color:var(--text);margin-bottom:2px}
+.field{display:grid;gap:6px}
+.field label{display:flex;justify-content:space-between;font-size:13px;font-weight:500;color:var(--muted);gap:10px}
+.field output{color:var(--amber);font-family:var(--f-mono);font-size:13px}
+input[type=range]{width:100%;accent-color:var(--amber);margin:0}
+select,input[type=number]{width:100%;background:var(--surface-2);color:var(--text);border:1px solid var(--line-strong);border-radius:10px;padding:10px 12px;font:inherit;font-size:15px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font:inherit;font-size:13px;font-weight:500;background:var(--surface-2);color:var(--text);border:1px solid var(--line-strong);border-radius:99px;padding:6px 12px;cursor:pointer}
+.chip:hover{border-color:var(--amber)}
+.chip.on{background:var(--amber);border-color:var(--amber);color:var(--amber-ink)}
+.chips-label{font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+.btn{font:inherit;font-weight:600;font-size:14px;background:var(--amber);color:var(--amber-ink);border:0;border-radius:10px;padding:10px 16px;cursor:pointer}
+.btn.alt{background:var(--surface-2);color:var(--text);border:1px solid var(--line-strong)}
+
+/* range rows */
+.rrw{position:relative;padding-bottom:26px}
+.rrw .gl{position:absolute;top:0;bottom:26px;width:1px;background:var(--line)}
+.rr{position:relative;margin-bottom:18px}
+.rr:last-of-type{margin-bottom:8px}
+.rr-h,.br-h{display:flex;justify-content:space-between;gap:12px;margin-bottom:7px;align-items:baseline}
+.rr-n,.br-h span{font-weight:500;min-width:0}
+.rr-n small,.br-h small{display:block;color:var(--muted);font-size:12px;font-weight:400}
+.rr-v,.br-h b{font-family:var(--f-mono);font-size:13px;color:var(--amber);white-space:nowrap;font-weight:500}
+.rr-t{position:relative;height:12px;background:var(--surface-2);border-radius:99px}
+.rr-b{position:absolute;top:0;height:100%;background:var(--amber);opacity:.55;border-radius:99px}
+.rr-m{position:absolute;top:-4px;width:4px;height:20px;background:var(--amber);border-radius:2px;margin-left:-2px;text-decoration:none}
+.rr-ax{position:absolute;left:0;right:0;bottom:0;height:20px}
+.rr-ax span{position:absolute;font-family:var(--f-mono);font-size:11px;color:var(--dim);transform:translateX(-50%);white-space:nowrap}
+.rr-ax span:first-child{transform:none}
+.rr-ax span:last-child{transform:translateX(-100%)}
+.br{margin-bottom:16px}
+.br-t{height:12px;background:var(--surface-2);border-radius:99px;overflow:hidden}
+.br-t i{display:block;height:100%;background:var(--amber);border-radius:99px;transition:width .35s}
+.br-t i.hot{background:var(--bad)}.br-t i.good{background:var(--good)}.br-t i.food{background:var(--food)}.br-t i.mute{background:var(--line-strong)}
+
+/* tables and lists */
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:right;padding:10px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+th:first-child,td:first-child{text-align:left;white-space:normal}
+th{font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500}
+tr.hl td{color:var(--amber);font-weight:600}
+.rank{list-style:none;margin:0;padding:0}
+.rank li{display:grid;grid-template-columns:28px minmax(0,1fr) auto auto;gap:12px;align-items:baseline;padding:10px 0;border-bottom:1px solid var(--line)}
+.rank .rk{font-family:var(--f-mono);font-size:12px;color:var(--dim)}
+.rank .rx{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.rank .rv{font-family:var(--f-mono);font-size:13px;color:var(--amber)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--muted);margin-bottom:16px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:baseline}
+.stackbar{display:flex;height:16px;border-radius:99px;overflow:hidden;background:var(--surface-2)}
+.stackbar i{display:block;height:100%}
+.sg-d{background:var(--amber)}.sg-f{background:var(--food)}.sg-c{background:var(--cover)}
+.kv{display:flex;flex-direction:column;gap:2px}
+.kv span{font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.kv b{font-family:var(--f-display);font-size:26px;color:var(--amber);font-weight:700}
+.kv small{color:var(--muted);font-size:13px}
+.kvs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.chart svg{display:block;max-width:100%;height:auto}
+.chart svg text{font-family:var(--f-mono)}
+.ax{fill:var(--dim);font-size:11px}
+.val{fill:var(--text);font-size:12px;font-weight:500;text-anchor:middle}
+.end{font-size:12px;font-weight:500}
+.gl-line{stroke:var(--line);stroke-width:1}
+.ref{stroke:var(--dim);stroke-width:1.5;stroke-dasharray:4 4}
+.ann{stroke:var(--bad);stroke-width:1.5;stroke-dasharray:3 4}
+.timeline{list-style:none;margin:0;padding:0;display:grid;gap:0}
+.timeline li{display:grid;grid-template-columns:96px minmax(0,1fr);gap:14px;padding:12px 0;border-bottom:1px solid var(--line)}
+.timeline time{font-family:var(--f-mono);font-size:12px;color:var(--amber);padding-top:2px}
+.checks{display:grid;gap:10px}
+.checks label{display:flex;gap:10px;align-items:center;font-size:14px;cursor:pointer}
+.checks input{accent-color:var(--amber);width:18px;height:18px;flex:none}
+.src{margin:0;padding-left:20px;display:grid;gap:6px;font-size:14px;color:var(--muted)}
+.gaps{margin:0;padding:0;list-style:none;display:grid;gap:10px}
+.gaps li{padding-left:18px;position:relative;color:var(--muted);font-size:14px}
+.gaps li::before{content:"";position:absolute;left:0;top:9px;width:8px;height:2px;background:var(--bad)}
+textarea{width:100%;min-height:160px;background:var(--surface-2);color:var(--text);border:1px solid var(--line-strong);border-radius:10px;padding:12px;font-family:var(--f-mono);font-size:12px;margin-top:14px}
+.msg{font-size:13px;color:var(--good);min-height:20px;margin-top:10px}
+.foot{color:var(--dim);font-size:13px;padding-top:32px;border-top:1px solid var(--line);max-width:80ch}
+
+/* happy hours */
+.hh-ctl{display:grid;gap:14px}
+.days{display:flex;flex-wrap:wrap;gap:6px}
+.opt{display:flex;gap:10px;align-items:center;font-size:14px;cursor:pointer}
+.opt input{accent-color:var(--amber);width:18px;height:18px;flex:none}
+.hh-sum{color:var(--muted);font-size:14px;margin-top:16px}
+.hh-chart{display:flex;align-items:flex-end;gap:6px;height:150px;border-bottom:1px solid var(--line-strong)}
+.hh-col{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:4px;min-width:0}
+.hh-col b{font-family:var(--f-mono);font-size:11px;color:var(--text);font-weight:500}
+.hh-col i{display:block;width:100%;background:var(--amber);border-radius:6px 6px 0 0;min-height:2px}
+.hh-col.now i{background:var(--good)}
+.hh-ax{display:flex;gap:6px;margin-top:6px}
+.hh-ax span{flex:1;text-align:center;font-family:var(--f-mono);font-size:11px;color:var(--dim)}
+.hh-row{display:grid;grid-template-columns:140px minmax(0,1fr) 170px;gap:18px;padding:16px 0;border-bottom:1px solid var(--line);align-items:start}
+.hh-row:last-child{border-bottom:0}
+.hh-time{font-family:var(--f-mono);font-size:13px;color:var(--amber);display:grid;gap:2px}
+.hh-name{font-weight:600;font-size:16px}
+.hh-meta{color:var(--muted);font-size:13px}
+.hh-deal{font-size:14px;margin-top:6px;display:grid;gap:2px}
+.hh-note{color:var(--muted);font-size:13px;margin-top:6px}
+.hh-src{font-size:12px;color:var(--muted);margin-top:8px;display:grid;gap:2px}
+.badge{display:inline-block;font-family:var(--f-mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:99px;border:1px solid currentColor;white-space:nowrap}
+.b-venue{color:var(--good)}.b-guide{color:var(--food)}.b-listing{color:var(--muted)}.b-conflict{color:var(--bad)}
+.live{font-family:var(--f-mono);font-size:11px;color:var(--good)}
+.legend-list{display:grid;gap:12px;font-size:14px;color:var(--muted)}
+.legend-list div{display:grid;grid-template-columns:120px minmax(0,1fr);gap:12px;align-items:start}
+@media (max-width:760px){
+  .hh-row{grid-template-columns:minmax(0,1fr);gap:8px}
+  .hh-time{grid-auto-flow:column;justify-content:start;gap:12px}
+  .legend-list div{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:1100px){
+  .app{grid-template-columns:200px minmax(0,1fr);gap:32px}
+  .g4{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .hero-grid,.g21{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:900px){
+  .app{grid-template-columns:minmax(0,1fr);gap:0}
+  .rail{position:sticky;top:env(safe-area-inset-top,0px);height:auto;z-index:20;background:var(--bg);padding:12px 0 8px;gap:8px;border-bottom:1px solid var(--line)}
+  .brand{flex-direction:row;align-items:baseline;gap:10px}
+  #nav{flex-direction:row;overflow-x:auto;scrollbar-width:none}
+  #nav a{white-space:nowrap}
+  .readout{display:none}
+  .sec{scroll-margin-top:96px;padding-block:40px}
+  .g2,.g3{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:560px){
+  .g4,.kpis,.kvs{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .card{padding:16px}
+  .profile-top svg{width:104px;height:104px}
+  .timeline li{grid-template-columns:76px minmax(0,1fr)}
+}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}.br-t i{transition:none}}
+</style>
+
+<style>body{margin:0}</style>
+</head>
+<body>
+<div class="app">
+  <nav class="rail" aria-label="Sections">
+    <div class="brand"><b>Prague Night Tab</b><span>Nightlife economics</span></div>
+    <ul id="nav"></ul>
+    <div class="readout"><span>Your annual tab</span><b id="roYr"></b><small id="roSub"></small></div>
+  </nav>
+
+  <main class="main">
+
+    <!-- OVERVIEW -->
+    <section class="sec" id="s-overview">
+      <div class="hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow">Prague · drinks &amp; nightlife economics</p>
+          <h1>What does a night out really cost?</h1>
+          <p class="lead">A half litre of beer costs 40 Kč on a Žižkov corner and 160 Kč on an Old Town Square terrace. This page prices the whole night, from the first pint to the club cover, and turns it into a yearly figure you can change.</p>
+          <div class="kpis" id="kpis"></div>
+        </div>
+
+        <div class="card profile" id="profile">
+          <div class="profile-top">
+            <div id="coaster"></div>
+            <div><b id="tabTitle"></b><p id="tabSub"></p></div>
+          </div>
+          <div>
+            <p class="chips-label">Preset</p>
+            <div class="chips" id="presets"></div>
+          </div>
+          <div>
+            <p class="chips-label">Drink</p>
+            <div class="chips" id="drinkChips"></div>
+          </div>
+          <div class="field"><label for="i-d">Drinks per night <output id="o-d"></output></label><input id="i-d" type="range" min="1" max="12" value="4"></div>
+          <div class="field"><label for="i-p">Price per drink <output id="o-p"></output></label><input id="i-p" type="range" min="30" max="400" step="5" value="120"></div>
+          <div class="field"><label for="i-w">Nights per week <output id="o-w"></output></label><input id="i-w" type="range" min="0" max="7" value="2"></div>
+          <div class="field"><label for="i-o">Other spending per night, in Kč (cover, food, taxi)</label><input id="i-o" type="number" min="0" step="10" value="0" inputmode="numeric"></div>
+          <div>
+            <p class="chips-label">Currency</p>
+            <div class="chips" id="curChips"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="findings">
+        <p class="eyebrow" style="margin-bottom:16px">Four numbers worth knowing</p>
+        <div class="g4" id="findings"></div>
+      </div>
+    </section>
+
+    <!-- DRINK PRICES -->
+    <section class="sec" id="s-prices">
+      <header class="sec-head">
+        <p class="eyebrow">Drink prices <span class="tag t-u">Your data</span></p>
+        <h2>What one drink costs</h2>
+        <p>Beer sits at the bottom of the scale and a premium cocktail at the top. The table shows what each choice adds up to if every drink of your night were that one.</p>
+      </header>
+      <div class="g21">
+        <div class="card"><h3>Price range per drink</h3><div id="priceRange"></div><p class="cap">The marker shows the average. The shaded bar runs from the low to the high price.</p></div>
+        <div class="card"><h3>What each drink adds up to</h3><div class="tw"><table id="priceTbl"></table></div></div>
+      </div>
+    </section>
+
+    <!-- AREAS -->
+    <section class="sec" id="s-areas">
+      <header class="sec-head">
+        <p class="eyebrow">Areas <span class="tag t-s">Sourced</span></p>
+        <h2>The same beer, a different street</h2>
+        <p>Price of a 0.5 l draught lager in 2026. Pubs outside the centre charge about half what the tourist terraces charge for the same pour.</p>
+      </header>
+      <div class="g2">
+        <div class="card"><h3>Beer by neighbourhood</h3><div id="areaRange"></div><p class="cap">Marker shows the midpoint of the range quoted by local price guides.</p></div>
+        <div class="stack">
+          <div class="card"><h3>Cheapest to most expensive</h3><ol class="rank" id="areaRank"></ol></div>
+          <div class="card"><h3>Prague against other regions</h3><div id="regionBars"></div><p class="cap">Average draught beer price per Dotykačka till data. The source does not state the year, so treat it as a rough comparison.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- COCKTAILS AND WINE -->
+    <section class="sec" id="s-cocktails">
+      <header class="sec-head">
+        <p class="eyebrow">Cocktails and wine <span class="tag t-s">Sourced</span></p>
+        <h2>Where the bill grows</h2>
+        <p>A cocktail costs between 120 and 310 Kč depending on the room. Happy hours are the one place where the price drops sharply.</p>
+      </header>
+      <div class="g2">
+        <div class="stack">
+          <div class="card"><h3>Cocktails by bar type</h3><div id="cockRange"></div></div>
+          <div class="card"><h3>Wine bar and pub extras</h3><div class="tw"><table id="extraTbl"></table></div></div>
+        </div>
+        <div class="card">
+          <h3>What happy hour saves you</h3>
+          <div class="field"><label for="hhT">Drink</label>
+            <select id="hhT"><option value="beer">Beer, 65 Kč normal vs 40 Kč happy hour</option><option value="cocktail">Cocktail, 260 Kč craft bar vs 135 Kč happy hour</option></select></div>
+          <div class="field" style="margin-top:14px"><label for="hhN">Drinks per night at happy hour <output id="o-hh"></output></label><input id="hhN" type="range" min="0" max="6" value="2"></div>
+          <div class="kvs" style="margin-top:20px" id="hhOut"></div>
+          <p class="cap">Uses your nights per week from the Overview panel. Happy hour prices come from Prague bar guides and run on weekday afternoons.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- HAPPY HOURS -->
+    <section class="sec" id="s-happy">
+      <header class="sec-head">
+        <p class="eyebrow">Happy hours <span class="tag t-s">Sourced</span></p>
+        <h2>When to arrive for cheaper drinks</h2>
+        <p>Prague venues with their happy hour days, times and deals. Every entry shows how well its times are confirmed. Pick a day, or switch on Happening now to see what is running in Prague at this moment.</p>
+      </header>
+      <div class="g21">
+        <div class="card">
+          <h3>Pick a day</h3>
+          <div class="hh-ctl">
+            <div class="days" id="hhDays"></div>
+            <label class="opt" for="hhNow"><input type="checkbox" id="hhNow">Happening now in Prague</label>
+            <label class="opt" for="hhConf"><input type="checkbox" id="hhConf">Only times confirmed on the venue's own site</label>
+          </div>
+          <p class="hh-sum" id="hhSum"></p>
+          <h3 style="margin-top:24px">Places with a happy hour, by hour</h3>
+          <div id="hhChart"></div>
+        </div>
+        <div class="stack">
+          <div class="card"><div class="kvs" id="hhStats"></div></div>
+          <div class="card"><h3>Cocktail prices quoted</h3><div id="hhLadder"></div><p class="cap">Lowest cocktail price quoted at each venue, against the normal craft bar price.</p></div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:16px"><h3 id="hhListTitle"></h3><div id="hhList"></div></div>
+      <div class="g2" style="margin-top:16px">
+        <div class="card"><h3>Listed without full times</h3><ul class="gaps" id="hhInc"></ul></div>
+        <div class="card"><h3>How the times were checked</h3>
+          <div class="legend-list">
+            <div><span class="badge b-venue">Venue site</span><span>The venue's own website states the days and times.</span></div>
+            <div><span class="badge b-guide">Local guide</span><span>A Prague guide published the times, and its pages agree. The venue's own site was not checked.</span></div>
+            <div><span class="badge b-listing">Listing only</span><span>One event listing, with no second source.</span></div>
+            <div><span class="badge b-conflict">Sources differ</span><span>Sources disagree on the days, times or price. Check before you go.</span></div>
+          </div>
+          <p class="cap">I read every page on 9 November 2026. Nobody phoned the venues or visited them, and happy hours change often. A Bombay Express offer that ended on 31 December 2025, shisha and tea-room deals, and a sushi roll discount were left out.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- CLUBS -->
+    <section class="sec" id="s-clubs">
+      <header class="sec-head">
+        <p class="eyebrow">Clubs <span class="tag t-s">Sourced</span></p>
+        <h2>Paying to get in</h2>
+        <p>Cover charges run from free to 300 Kč for ordinary nights. Concerts and special events can cost more than that.</p>
+      </header>
+      <div class="g2">
+        <div class="card"><h3>Club entrance fees</h3><div id="clubRange"></div></div>
+        <div class="card">
+          <h3>What cover adds up to</h3>
+          <div class="field"><label for="clubSel">Club</label><select id="clubSel"></select></div>
+          <div class="field" style="margin-top:14px"><label for="clubM">Club nights per month <output id="o-cm"></output></label><input id="clubM" type="range" min="0" max="12" value="2"></div>
+          <div class="kvs" style="margin-top:20px" id="clubOut"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- NIGHT TYPES -->
+    <section class="sec" id="s-nights">
+      <header class="sec-head">
+        <p class="eyebrow">Night types <span class="tag t-m">Modelled</span></p>
+        <h2>One night, six ways to spend it</h2>
+        <p>Each night is built from the unit prices on this page. The assumptions sit under every bar, so you can check the arithmetic.</p>
+      </header>
+      <div class="g21">
+        <div class="card">
+          <h3>Cost per person for one night</h3>
+          <div class="legend"><span><i class="sg-d"></i>Drinks</span><span><i class="sg-f"></i>Food</span><span><i class="sg-c"></i>Cover</span></div>
+          <div id="nightStack"></div>
+          <div class="field" style="margin-top:8px"><label for="tip">Rounded-up tip on food and drinks <output id="o-tip"></output></label><input id="tip" type="range" min="0" max="15" step="1" value="0"></div>
+        </div>
+        <div class="stack">
+          <div class="card"><h3>Per year</h3><div class="tw"><table id="nightTbl"></table></div></div>
+          <div class="note-box" id="rvc"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TOURIST VS LOCAL -->
+    <section class="sec" id="s-tourist">
+      <header class="sec-head">
+        <p class="eyebrow">Tourist or local <span class="tag t-m">Modelled</span></p>
+        <h2>What the address costs you in a year</h2>
+        <p>Pick two areas and compare them at your drinks per night and nights per week. Prices use the midpoint of each area's range.</p>
+      </header>
+      <div class="g2">
+        <div class="card">
+          <h3>Compare two areas</h3>
+          <div class="field"><label for="areaA">Area A</label><select id="areaA"></select></div>
+          <div class="field" style="margin-top:14px"><label for="areaB">Area B</label><select id="areaB"></select></div>
+          <p class="cap">Uses the drinks per night and nights per week from the Overview panel.</p>
+        </div>
+        <div class="card"><div class="kvs" id="tourOut"></div><div style="margin-top:22px" id="tourBars"></div></div>
+      </div>
+    </section>
+
+    <!-- TREND -->
+    <section class="sec" id="s-trend">
+      <header class="sec-head">
+        <p class="eyebrow">Price trend <span class="tag t-s">Sourced</span></p>
+        <h2>Beer got 40% dearer in three years</h2>
+        <p>Average price of a draught half litre in Prague restaurants, from cash register data. I found no comparable average for 2025, so the line stops at 2024.</p>
+      </header>
+      <div class="g21">
+        <div class="card"><h3>Prague draught beer price</h3><div class="chart" id="trendChart"></div>
+          <p class="cap">The hollow marker is a crowd-sourced Numbeo figure from October 2026. It uses a different method, so it is not joined to the line.</p></div>
+        <div class="stack">
+          <div class="card"><div class="kvs" id="trendStats"></div></div>
+          <div class="card"><h3>Year on year</h3><div class="tw"><table id="trendTbl"></table></div></div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:16px">
+        <h3>What pushed prices up</h3>
+        <ul class="timeline">
+          <li><time>Oct 2021</time><span>Plzeňský Prazdroj raised draught prices for the first time since 2018, by about 3% on average.</span></li>
+          <li><time>2022–23</time><span>Energy and operating costs led bars to add 5 to 10 Kč per half litre, more than the breweries themselves did.</span></li>
+          <li><time>Jan 2024</time><span>VAT on draught beer moved from 10% to 21%. Prague restaurants added 3 to 4 Kč per pint, and 62% of surveyed pubs raised prices.</span></li>
+          <li><time>1 Oct 2026</time><span>Pilsner Urquell's maker announced a 2.6% rise on draught and bottled beer, its first since 2023.</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- SCENARIOS -->
+    <section class="sec" id="s-scenarios">
+      <header class="sec-head">
+        <p class="eyebrow">Scenarios <span class="tag t-u">Your data</span></p>
+        <h2>Four ways to go out, and where you fit</h2>
+        <p>The bottom bar is your own profile from the Overview panel, drawn against the four lifestyle scenarios.</p>
+      </header>
+      <div class="g21">
+        <div class="card"><h3>Annual spend</h3><div id="scBars"></div></div>
+        <div class="stack">
+          <div class="card"><div class="kvs" id="scStats"></div></div>
+          <div class="card"><div class="tw"><table id="scTbl"></table></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SAVINGS -->
+    <section class="sec" id="s-savings">
+      <header class="sec-head">
+        <p class="eyebrow">Savings <span class="tag t-m">Modelled</span></p>
+        <h2>What each habit change is worth</h2>
+        <p>Tick the changes you would make. Each bar shows the yearly saving from that change alone, and the total combines the ones you ticked.</p>
+      </header>
+      <div class="g2">
+        <div class="card"><h3>Changes</h3><div class="checks" id="svList"></div></div>
+        <div class="card"><div id="svBars"></div><div class="kvs" style="margin-top:20px" id="svOut"></div></div>
+      </div>
+    </section>
+
+    <!-- PROJECTION -->
+    <section class="sec" id="s-projection">
+      <header class="sec-head">
+        <p class="eyebrow">Projection <span class="tag t-m">Modelled</span></p>
+        <h2>Your tab over the next ten years</h2>
+        <p>Spending rises with price inflation. The second line shows what the same money would be worth if you invested it at the end of each year instead. Both rates are assumptions you can change. This is an illustration and not financial advice.</p>
+      </header>
+      <div class="g21">
+        <div class="card"><h3>Cumulative spend</h3><div class="chart" id="projChart"></div></div>
+        <div class="stack">
+          <div class="card">
+            <div class="field"><label for="pY">Years <output id="o-pY"></output></label><input id="pY" type="range" min="1" max="10" value="10"></div>
+            <div class="field" style="margin-top:14px"><label for="pI">Price inflation per year <output id="o-pI"></output></label><input id="pI" type="range" min="0" max="8" step="0.1" value="2.2"></div>
+            <div class="field" style="margin-top:14px"><label for="pR">Investment return per year <output id="o-pR"></output></label><input id="pR" type="range" min="0" max="10" step="0.5" value="4"></div>
+            <p class="cap">The 2.2% default is the Czech National Bank's 2026 inflation projection.</p>
+          </div>
+          <div class="card"><div class="kvs" id="projOut"></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SOURCES -->
+    <section class="sec" id="s-sources">
+      <header class="sec-head">
+        <p class="eyebrow">Sources and gaps</p>
+        <h2>Where the numbers come from</h2>
+        <p>“Sourced” figures are ranges quoted by the pages below, and they differ between guides. “Modelled” figures are my calculations from those unit prices. “Your data” comes from the tables you supplied.</p>
+      </header>
+      <div class="g2">
+        <div class="stack">
+          <div class="card"><h3>Not found</h3>
+            <ul class="gaps">
+              <li>Monthly spending by age group. Only survey data on which days each age group drinks exists.</li>
+              <li>Spending by tourists compared with residents. The Tourist or local section compares prices instead.</li>
+              <li>A 2025 or 2026 average beer price from cash register data.</li>
+              <li>A per-person nightly spend figure for Prague. The Night types section is modelled.</li>
+              <li>Happy hour times confirmed by phone or in person. Only four venues state their times on their own site, one of which disagrees with a listing. Most others rest on a single listing.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Take the data with you</h3>
+            <div class="chips"><button class="btn" id="cpCsv" type="button">Copy CSV</button><button class="btn alt" id="cpJson" type="button">Copy JSON</button></div>
+            <p class="msg" id="exMsg" role="status"></p>
+            <textarea id="exOut" readonly hidden aria-label="Exported data"></textarea>
+          </div>
+        </div>
+        <div class="card"><h3>Sources</h3>
+          <ol class="src">
+            <li><a href="https://www.prague-guide.co.uk/comparison-of-prices-of-beer-in-the-world-the-cheapest-one-is-draught-in-prague-in-oslo-you-pay-up-to-250-czk/">Prague Guide, 2026 beer prices</a></li>
+            <li><a href="https://www.helloprague.net/prague-beer-guide/">HelloPrague, beer guide 2026</a></li>
+            <li><a href="https://www.czechjournal.cz/prague-beer-guide/">Czech Journal, Prague beer guide</a></li>
+            <li><a href="https://guides.wepartynow.com/prague/best-bars-in-prague/">WePartyNow, beer price by district</a></li>
+            <li><a href="https://europenightlife.com/czech-republic/prague/best-bars-in-prague">EuropeNightlife, cocktail prices</a></li>
+            <li><a href="https://pulserevops.com/nightlife/nl0164">Pulse, Dlouhá cocktail and beer prices</a></li>
+            <li><a href="https://expatistan.com/price/cocktail/prague">Expatistan, club cocktail price</a></li>
+            <li><a href="https://bestpragueguide.com/en/blog/prague-happy-hour">Best Prague Guide, happy hours</a></li>
+            <li><a href="https://www.praguego.com/?p=2236">PragueGo, club entrance fees</a></li>
+            <li><a href="https://europe.stripes.com/travel/enjoy-the-nightlife-of-prague.html">Stripes Europe, club entrance fees</a></li>
+            <li><a href="https://www.expats.cz/czech-news/article/frustration-brewing-consumers-complain-of-paying-more-for-less-beer-in-czechia">Expats.cz, Dotykačka beer price series</a></li>
+            <li><a href="https://expats.cz/czech-news/article/prague-beer-prices-bubble-up-in-2023-with-further-increases-expected">Expats.cz, Prague beer prices in 2023</a></li>
+            <li><a href="https://czechdaily.cz/?p=13993">Czech Daily, regional draught prices</a></li>
+            <li><a href="https://english.radio.cz/node/8810501">Radio Prague, VAT survey of pubs</a></li>
+            <li><a href="https://www.intellinews.com/czech-pilsner-hikes-beer-prices-by-2-6-over-hormuz-crisis-impact-464181/">bne IntelliNews, 2026 Pilsner price rise</a></li>
+            <li><a href="https://expats.cz/czech-news/article/two-fifths-of-czechs-show-risky-behavior-with-alcohol">Expats.cz, when Czechs drink by age</a></li>
+            <li><a href="https://www.pragueexperience.com/pop-up-information/price-rating-restaurants.asp">Prague Experience, restaurant prices</a></li>
+            <li><a href="https://www.gotripzi.com/destinations/prague-cz/cost">Gotripzi, couvert charge</a></li>
+            <li><a href="https://bavsevpraze.cz/happy-hours">bavsevpraze.cz, happy hour listings</a></li>
+            <li><a href="https://www.dejavubar.cz/en/happy-hour/">Déjávu Music Bar, happy hour</a></li>
+            <li><a href="https://www.thepitch.cz/article.php?k=hh_info&amp;lang=en">The Pitch, happy hour</a></li>
+            <li><a href="https://cafe.hardrock.com/prague/">Hard Rock Cafe Prague</a></li>
+            <li><a href="https://www.praguest.com/en/2130-happy-hours-at-hard-rock-cafe-prague">Praguest, Hard Rock happy hours</a></li>
+            <li><a href="https://www.slivovitzmuseum.com/easter-menu/">Slivovitz Museum, cocktail happy hour</a></li>
+            <li><a href="https://spottedbylocals.com/prague/ananas-bananas">Spotted by Locals, Ananas Bananas</a></li>
+            <li><a href="https://goout.net/de/alibi-cocktail-and-music-bar/vzxhbb/">GoOut, ALIBI Cocktail &amp; Music Bar</a></li>
+            <li><a href="https://bestpragueguide.com/en/blog/prague-happy-hour">Best Prague Guide, happy hours</a></li>
+          </ol>
+        </div>
+      </div>
+      <p class="foot">All figures are estimates, not official survey averages. Monthly spending is weekly spending × 4.33. Euro amounts use 25 Kč per €1. Prices were gathered in November 2026 and change often.</p>
+    </section>
+
+  </main>
+</div>
+
+<script>
+const RATE=25,WPM=4.33;
+const $=id=>document.getElementById(id);
+const nf=n=>Math.round(n).toLocaleString('en-US');
+const P={d:4,p:120,w:2,o:0,cur:'CZK'};
+const S={tip:0,areaA:0,areaB:5,club:3,clubM:2,hhT:'beer',hhN:2,sv:{sv1:true,sv2:false,sv3:false,sv4:false,sv5:false},pY:10,pI:2.2,pR:4};
+
+function money(n){
+  if(P.cur==='EUR'){const e=n/RATE;return '€'+((Math.abs(e)<20&&!Number.isInteger(e))?e.toFixed(2):nf(e));}
+  return (Number.isInteger(n)||Math.abs(n)>=200?nf(n):(Math.round(n*10)/10).toLocaleString('en-US'))+' Kč';
+}
+const night=()=>P.d*P.p+P.o, wk=()=>night()*P.w, yr=()=>wk()*52, mo=()=>wk()*WPM;
+const plural=(n,w)=>n+' '+w+(n===1?'':'s');
+
+/* ---------- data ---------- */
+const drinks=[
+ {n:'Beer',avg:67.5,lo:45,hi:90},
+ {n:'Wine',avg:112.5,lo:75,hi:150},
+ {n:'Aperol Spritz',avg:157.5,lo:120,hi:195},
+ {n:'Premium cocktail',avg:250,lo:180,hi:300}];
+const scen=[
+ {n:'Occasional',d:2,w:1,p:100},
+ {n:'Social',d:3,w:1,p:120},
+ {n:'Regular',d:4,w:2,p:120},
+ {n:'Frequent',d:5,w:3,p:150}].map(s=>{s.wk=s.d*s.w*s.p;s.mo=+(s.wk*WPM).toFixed(1);s.yr=s.wk*52;return s});
+const areas=[
+ {n:'Žižkov',lo:40,hi:60,note:'Densest pub scene in the city'},
+ {n:'Vršovice and Nusle',lo:40,hi:55,note:'Neighbourhood hospody'},
+ {n:'Holešovice and Karlín',lo:55,hi:70,note:'Local and expat mix'},
+ {n:'Vinohrady',lo:55,hi:80,note:'Gastropubs and wine bars'},
+ {n:'Old Town streets',lo:70,hi:120,note:'Tourist-oriented bars'},
+ {n:'Old Town Square terraces',lo:120,hi:160,note:'Paying for the address'}
+].map(a=>{a.mid=(a.lo+a.hi)/2;return a});
+const regions=[{n:'Prague',v:62.9,cls:''},{n:'Plzeň Region',v:53.5,cls:'food'},{n:'Moravian-Silesian Region',v:46.4,cls:'mute'}];
+const cocktails=[
+ {n:'Happy hour, before 7 pm',lo:120,hi:150},
+ {n:'Downtown club',lo:198,hi:201},
+ {n:'Craft cocktail bar',lo:220,hi:300,note:'Dlouhá and Old Town cellars'},
+ {n:'Hotel or world-ranked bar',lo:240,hi:310,note:'Alcron, Hemingway and similar'}];
+const extras=[
+ ['Wine, 1 dl glass at a wine bar','from 55 Kč'],
+ ['Wine, glass at happy hour','from 60 Kč'],
+ ['Wine, house glass in a restaurant','65–135 Kč'],
+ ['Wine, bottle of decent red','about 235 Kč'],
+ ['Craft beer pour','70–120 Kč'],
+ ['Beer at happy hour, 0.5 l','35–45 Kč'],
+ ['Couvert or bread charge in traditional pubs','about 45 Kč']];
+const clubs=[
+ {n:'Cross Club',lo:0,hi:100,note:'Usually free, small charge for live acts'},
+ {n:'Lucerna Music Bar',lo:100,hi:100,note:'80s and 90s party nights. Concerts cost more'},
+ {n:'Fancy Lounge',lo:100,hi:100,note:'Cheaper than most clubs'},
+ {n:'Karlovy Lázně',lo:150,hi:200,note:'Five floors near Charles Bridge'},
+ {n:'Typical Prague club',lo:100,hi:300,note:'General range'}
+].map(c=>{c.mid=(c.lo+c.hi)/2;return c});
+const nights=[
+ {n:'Local pub',cover:0,food:0,drinks:270,desc:'4 beers × 67.5'},
+ {n:'Wine bar',cover:0,food:0,drinks:450,desc:'4 glasses × 112.5'},
+ {n:'Restaurant dinner',cover:0,food:625,drinks:180,desc:'2-course dinner 625 + 2 drinks × 90'},
+ {n:'Cocktail bar',cover:0,food:0,drinks:780,desc:'3 cocktails × 260'},
+ {n:'Hotel bar',cover:0,food:0,drinks:825,desc:'3 cocktails × 275'},
+ {n:'Nightclub',cover:200,food:0,drinks:800,desc:'cover 200 + 4 cocktails × 200'}];
+const trend=[[2021,52],[2022,58.8],[2023,64.3],[2024,73]];
+const hhData={beer:{full:65,hh:40,n:'beer'},cocktail:{full:260,hh:135,n:'cocktail'}};
+const svOpts=[
+ {id:'sv1',n:'Order one fewer drink each night',f:s=>({...s,d:Math.max(0,s.d-1)})},
+ {id:'sv2',n:'Skip one night a week',f:s=>({...s,w:Math.max(0,s.w-1)})},
+ {id:'sv3',n:'Drink at a local pub at 50 Kč a pint',f:s=>({...s,p:Math.min(s.p,50)})},
+ {id:'sv4',n:'Take two drinks a night at beer happy hour (saves 25 Kč each)',f:s=>({...s,disc:s.disc+Math.min(2,s.d)*25})},
+ {id:'sv5',n:'Drop the other spending (cover, food, taxi)',f:s=>({...s,o:0})}];
+const sections=[['s-overview','Overview'],['s-prices','Drink prices'],['s-areas','Areas'],['s-cocktails','Cocktails and wine'],['s-happy','Happy hours'],['s-clubs','Clubs'],['s-nights','Night types'],['s-tourist','Tourist or local'],['s-trend','Price trend'],['s-scenarios','Scenarios'],['s-savings','Savings'],['s-projection','Projection'],['s-sources','Sources and gaps']];
+
+/* ---------- helpers ---------- */
+function niceTicks(max,n){n=n||4;max=Math.max(max,1);const raw=max/n,p=Math.pow(10,Math.floor(Math.log10(raw))),m=raw/p;const step=(m<=1?1:m<=2?2:m<=5?5:10)*p;const out=[];for(let v=0;v<=max+step*0.001;v+=step)out.push(+v.toFixed(6));if(out[out.length-1]<max)out.push(out[out.length-1]+step);return out}
+function rangeRows(items,max,step){
+  const tk=[];for(let v=0;v<=max;v+=step)tk.push(v);
+  const grid=tk.map(v=>`<i class="gl" style="left:${v/max*100}%"></i>`).join('');
+  const rows=items.map(it=>{
+    const mid=it.mid!=null?it.mid:null;
+    return `<div class="rr"><div class="rr-h"><span class="rr-n">${it.n}${it.note?`<small>${it.note}</small>`:''}</span><span class="rr-v">${it.lo===it.hi?money(it.lo):money(it.lo)+' – '+money(it.hi)}</span></div><div class="rr-t"><b class="rr-b" style="left:${it.lo/max*100}%;width:${Math.max((it.hi-it.lo)/max*100,1.4)}%"></b>${mid!=null?`<u class="rr-m" style="left:${mid/max*100}%"></u>`:''}</div></div>`}).join('');
+  const axis=`<div class="rr-ax">${tk.map(v=>`<span style="left:${v/max*100}%">${money(v)}</span>`).join('')}</div>`;
+  return `<div class="rrw">${grid}${rows}${axis}</div>`;
+}
+function barRows(items,o){
+  const mx=o.max||Math.max(1,...items.map(i=>i.v));
+  return items.map(i=>`<div class="br"><div class="br-h"><span>${i.n}${i.note?`<small>${i.note}</small>`:''}</span><b>${o.fmt(i.v)}</b></div><div class="br-t"><i class="${i.cls||''}" style="width:${Math.max(0,Math.min(100,i.v/mx*100))}%"></i></div></div>`).join('');
+}
+function kv(label,value,small){return `<div class="kv"><span>${label}</span><b>${value}</b>${small?`<small>${small}</small>`:''}</div>`}
+function stat(label,value,small){return `<div class="stat"><span>${label}</span><b>${value}</b>${small?`<small>${small}</small>`:''}</div>`}
+
+function lineChart(el,o){
+  const W=Math.max(300,Math.floor(el.clientWidth||640)),H=W<520?250:330;
+  const m={l:W<520?48:60,r:W<520?64:92,t:20,b:34};
+  const iw=W-m.l-m.r,ih=H-m.t-m.b;
+  const sx=x=>m.l+(x-o.x0)/(o.x1-o.x0)*iw,sy=y=>m.t+(o.y1-y)/(o.y1-o.y0)*ih;
+  let s=`<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="${o.label}">`;
+  o.yt.forEach(v=>{s+=`<line x1="${m.l}" x2="${W-m.r}" y1="${sy(v)}" y2="${sy(v)}" class="gl-line"/><text x="${m.l-8}" y="${sy(v)+4}" text-anchor="end" class="ax">${o.yf(v)}</text>`});
+  o.xt.forEach(v=>{s+=`<text x="${sx(v)}" y="${H-10}" text-anchor="middle" class="ax">${v}</text>`});
+  (o.refs||[]).forEach(r=>{s+=`<line x1="${m.l}" x2="${W-m.r}" y1="${sy(r.y)}" y2="${sy(r.y)}" class="ref"/><text x="${m.l+6}" y="${sy(r.y)-6}" class="ax">${r.label}</text>`});
+  (o.ann||[]).forEach(a=>{s+=`<line x1="${sx(a.x)}" x2="${sx(a.x)}" y1="${m.t}" y2="${m.t+ih}" class="ann"/><text x="${sx(a.x)-6}" y="${m.t+12}" text-anchor="end" class="ax">${a.label}</text>`});
+  o.series.forEach(se=>{
+    const col=`var(${se.c})`;
+    if(se.line!==false&&se.pts.length>1)s+=`<polyline fill="none" style="stroke:${col}" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" points="${se.pts.map(p=>sx(p[0])+','+sy(p[1])).join(' ')}"/>`;
+    if(se.dots)se.pts.forEach(p=>{
+      s+=`<circle cx="${sx(p[0])}" cy="${sy(p[1])}" r="5" stroke-width="2.5" style="stroke:${col};fill:${se.hollow?'var(--bg)':col}"/>`;
+      if(se.vals)s+=`<text x="${sx(p[0])}" y="${sy(p[1])-12}" class="val">${se.vf(p[1])}</text>`;
+    });
+    if(se.end){const p=se.pts[se.pts.length-1];s+=`<text x="${sx(p[0])+10}" y="${sy(p[1])+4}" class="end" style="fill:${col}">${se.end}</text>`}
+  });
+  el.innerHTML=s+'</svg>';
+}
+
+/* ---------- renderers ---------- */
+function rCoaster(){
+  const n=P.d*P.w,shown=Math.min(n,30),groups=Math.ceil(shown/5);
+  let marks='';
+  const rows=groups>3?2:1;
+  for(let g=0;g<groups;g++){
+    const row=Math.floor(g/3),inRow=Math.min(3,groups-row*3),col=g%3;
+    const cx=120+(col-(inRow-1)/2)*62,cy=rows===2?(row===0?92:150):120;
+    const cnt=Math.min(5,shown-g*5);
+    for(let i=0;i<Math.min(4,cnt);i++){const x=cx-12+i*8;marks+=`<line x1="${x}" y1="${cy-17}" x2="${x}" y2="${cy+17}"/>`}
+    if(cnt===5)marks+=`<line x1="${cx-17}" y1="${cy+11}" x2="${cx+17}" y2="${cy-11}"/>`;
+  }
+  const extra=n>30?`<text x="120" y="190" text-anchor="middle" style="font-size:12px;fill:var(--coaster-ink);font-family:var(--f-mono)">+${n-30} more</text>`:'';
+  const none=n===0?`<text x="120" y="126" text-anchor="middle" style="font-size:13px;fill:var(--coaster-ink);font-family:var(--f-mono)">no tab</text>`:'';
+  $('coaster').innerHTML=`<svg viewBox="0 0 240 240" role="img" aria-label="Beer mat with ${n} tally marks for this week's drinks"><circle cx="120" cy="120" r="114" style="fill:var(--coaster);stroke:var(--line-strong)" stroke-width="2"/><circle cx="120" cy="120" r="102" fill="none" style="stroke:var(--coaster-ink)" stroke-width="1.2" stroke-dasharray="2 5" opacity=".5"/><text x="120" y="54" text-anchor="middle" style="font-size:13px;letter-spacing:.2em;fill:var(--coaster-ink);font-family:var(--f-mono)">ČÁRKY</text><g style="stroke:var(--coaster-ink)" stroke-width="3.2" stroke-linecap="round">${marks}</g>${extra}${none}<text x="120" y="214" text-anchor="middle" style="font-size:11px;letter-spacing:.16em;fill:var(--coaster-ink);font-family:var(--f-mono)">THIS WEEK</text></svg>`;
+  $('tabTitle').textContent=plural(n,'drink')+' this week';
+  $('tabSub').textContent=n?`${money(wk())} on the tab, ${money(night())} a night.`:'Raise the nights per week to start a tab.';
+}
+function rKpis(){
+  const dr=P.d*P.w*52;
+  $('kpis').innerHTML=[
+    stat('Per night',money(night()),`${P.d} × ${money(P.p)}${P.o?` + ${money(P.o)} other`:''}`),
+    stat('Per month',money(mo()),`${plural(P.w,'night')} a week`),
+    stat('Per year',money(yr()),P.cur==='CZK'?`about €${nf(yr()/RATE)}`:`about ${nf(yr())} Kč`),
+    stat('Drinks a year',nf(dr),dr?`${money(yr()/dr)} each, all in`:'')
+  ].join('');
+  $('roYr').textContent=money(yr());
+  $('roSub').textContent=`${P.d} drinks, ${plural(P.w,'night')} a week`;
+}
+function rFindings(){
+  const cheap=areas[0],dear=areas[areas.length-1];
+  const tot=nights.map(n=>n.cover+n.food+n.drinks),mn=Math.min(...tot),mx=Math.max(...tot);
+  $('findings').innerHTML=[
+    stat('Same pint, different street',(dear.hi/cheap.lo).toFixed(0)+'×',`${money(cheap.lo)} in Žižkov against ${money(dear.hi)} on Old Town Square.`),
+    stat('Pint price, 2021 to 2024','+'+Math.round((trend[3][1]/trend[0][1]-1)*100)+'%',`From ${money(trend[0][1])} to ${money(trend[3][1])} in Prague restaurants.`),
+    stat('One modelled night',`${money(mn)}–${money(mx)}`,'From a local pub to a nightclub with cover.'),
+    stat('Cocktail at happy hour','−'+Math.round((1-135/260)*100)+'%','About 135 Kč against 260 Kč at a craft bar.')
+  ].join('');
+}
+function rPrices(){
+  $('priceRange').innerHTML=rangeRows(drinks.map(d=>({n:d.n,lo:d.lo,hi:d.hi,mid:d.avg})),320,80);
+  const dr=P.d*P.w*52;
+  $('priceTbl').innerHTML='<tr><th>Drink</th><th>Average</th><th>Round of 4</th><th>Per year</th></tr>'+drinks.map(d=>`<tr><td>${d.n}</td><td>${money(d.avg)}</td><td>${money(d.avg*4)}</td><td>${money(dr*d.avg+P.o*P.w*52)}</td></tr>`).join('');
+}
+function rAreas(){
+  $('areaRange').innerHTML=rangeRows(areas,180,60);
+  const rk=[...areas].sort((a,b)=>a.mid-b.mid),b0=rk[0].mid;
+  $('areaRank').innerHTML=rk.map((a,i)=>`<li><span class="rk">${i+1}</span><span>${a.n}</span><span class="rx">${(a.mid/b0).toFixed(1)}×</span><span class="rv">${money(a.mid)}</span></li>`).join('');
+  $('regionBars').innerHTML=barRows(regions,{max:70,fmt:v=>money(v)});
+}
+function rCock(){
+  $('cockRange').innerHTML=rangeRows(cocktails,320,80);
+  $('extraTbl').innerHTML='<tr><th>Item</th><th>Price</th></tr>'+extras.map(e=>`<tr><td>${e[0]}</td><td>${P.cur==='EUR'?e[1].replace(/\d[\d–]*\d* ?Kč/g,m=>{const nums=m.replace(/ ?Kč/,'').split('–').map(Number);return nums.map(n=>'€'+(n/RATE).toFixed(2)).join('–')}):e[1]}</td></tr>`).join('');
+  const h=hhData[S.hhT],sv=h.full-h.hh,perNight=S.hhN*sv,perYear=perNight*P.w*52;
+  $('o-hh').textContent=S.hhN;
+  $('hhOut').innerHTML=kv('Saved per drink',money(sv),`${money(h.full)} down to ${money(h.hh)}`)+kv('Saved per night',money(perNight),`${plural(S.hhN,h.n)} at happy hour`)+kv('Saved per year',money(perYear),`${plural(P.w,'night')} a week`)+kv('Share of a drink',Math.round(sv/h.full*100)+'%','taken off the normal price');
+}
+function rClubs(){
+  $('clubRange').innerHTML=rangeRows(clubs,320,80);
+  const c=clubs[S.club],yrC=c.mid*S.clubM*12;
+  $('o-cm').textContent=S.clubM;
+  $('clubOut').innerHTML=kv('Cover per visit',c.lo===c.hi?money(c.lo):money(c.lo)+'–'+money(c.hi),c.note)+kv('Cover per year',money(yrC),`${plural(S.clubM,'visit')} a month at the midpoint`)+kv('Share of a club night',Math.round(c.mid/(c.mid+800)*100)+'%','cover against 4 cocktails at 200 Kč')+kv('Per visit incl. drinks',money(c.mid+800),'cover plus 4 cocktails');
+}
+function nightTotals(){return nights.map(n=>({...n,total:(n.food+n.drinks)*(1+S.tip/100)+n.cover}))}
+function rNights(){
+  const nt=nightTotals(),mx=Math.max(...nt.map(n=>n.total));
+  $('o-tip').textContent=S.tip+'%';
+  $('nightStack').innerHTML=nt.map(n=>{
+    const k=1+S.tip/100,d=n.drinks*k,f=n.food*k,c=n.cover,sc=n.total/mx*100;
+    return `<div class="br"><div class="br-h"><span>${n.n}<small>${n.desc}</small></span><b>${money(n.total)}</b></div><div class="stackbar" style="width:${sc}%"><i class="sg-d" style="width:${d/n.total*100}%"></i><i class="sg-f" style="width:${f/n.total*100}%"></i><i class="sg-c" style="width:${c/n.total*100}%"></i></div></div>`}).join('');
+  $('nightTbl').innerHTML='<tr><th>Night</th><th>Once a week</th><th>Your '+(P.w)+'×</th></tr>'+nt.map(n=>`<tr><td>${n.n}</td><td>${money(n.total*52)}</td><td>${money(n.total*P.w*52)}</td></tr>`).join('');
+  const rest=nt.find(n=>n.n==='Restaurant dinner'),club=nt.find(n=>n.n==='Nightclub');
+  $('rvc').innerHTML=`<b>Restaurant against nightclub.</b> A modelled club night costs ${money(club.total-rest.total)} more than a restaurant dinner with two drinks (${money(club.total)} against ${money(rest.total)}). Every drink is a 200 Kč cocktail, and the 200 Kč cover comes on top.`;
+}
+function rTour(){
+  const A=areas[S.areaA],B=areas[S.areaB],n=P.d*P.w*52,yA=n*A.mid,yB=n*B.mid;
+  $('tourOut').innerHTML=kv(A.n,money(yA),`per year at ${money(A.mid)} a beer`)+kv(B.n,money(yB),`per year at ${money(B.mid)} a beer`)+kv('Difference',money(Math.abs(yA-yB)),yA===yB?'same price':`${yA>yB?A.n:B.n} costs more`)+kv('Price multiple',(Math.max(A.mid,B.mid)/Math.min(A.mid,B.mid)).toFixed(1)+'×','dearer area against cheaper');
+  const mx=Math.max(yA,yB,1);
+  $('tourBars').innerHTML=barRows([{n:A.n,v:yA,cls:yA>yB?'hot':'good'},{n:B.n,v:yB,cls:yB>yA?'hot':'good'}],{max:mx,fmt:v=>money(v)});
+}
+function rTrend(){
+  const el=$('trendChart');
+  lineChart(el,{label:'Prague draught beer price per half litre from 2021 to 2024, with a 2026 crowd-sourced point',x0:2020.6,x1:2026.4,y0:40,y1:80,xt:[2021,2022,2023,2024,2025,2026],yt:[40,50,60,70,80],yf:v=>money(v),
+    refs:[{y:67.5,label:'Your data average '+money(67.5)}],ann:[{x:2024,label:'VAT 10% to 21%'}],
+    series:[{c:'--amber',pts:trend,dots:true,vals:true,vf:v=>money(v)},{c:'--food',pts:[[2026,69]],dots:true,hollow:true,line:false,vals:true,vf:v=>money(v),end:'Numbeo'}]});
+  const tot=trend[3][1]/trend[0][1]-1,cagr=Math.pow(trend[3][1]/trend[0][1],1/3)-1,diff=trend[3][1]-trend[0][1];
+  $('trendStats').innerHTML=kv('2021 to 2024','+'+(tot*100).toFixed(0)+'%',`${money(trend[0][1])} to ${money(trend[3][1])}`)+kv('Per year','+'+(cagr*100).toFixed(1)+'%','compounded')+kv('Extra per pint','+'+money(diff))+kv('Extra per year',money(diff*P.d*P.w*52),'beer only, at your pace');
+  $('trendTbl').innerHTML='<tr><th>Year</th><th>Price</th><th>Change</th></tr>'+trend.map((t,i)=>`<tr><td>${t[0]}</td><td>${money(t[1])}</td><td>${i?'+'+((t[1]/trend[i-1][1]-1)*100).toFixed(1)+'%':'base'}</td></tr>`).join('');
+}
+function rScen(){
+  const you={n:'You',v:yr(),cls:'good',note:`${P.d} × ${money(P.p)} × ${P.w} a week${P.o?' + other':''}`};
+  const items=scen.map(s=>({n:s.n,v:s.yr,note:`${s.d} drinks × ${s.w} night${s.w>1?'s':''} × ${money(s.p)}`}));
+  items.push(you);
+  const mx=Math.max(...items.map(i=>i.v),1);
+  $('scBars').innerHTML=barRows(items,{max:mx,fmt:v=>money(v)});
+  $('scStats').innerHTML=kv('Frequent vs Regular',(scen[3].yr/scen[2].yr).toFixed(1)+'×','the yearly bill')+kv('Regular vs Occasional',(scen[2].yr/scen[0].yr).toFixed(1)+'×','the yearly bill');
+  $('scTbl').innerHTML='<tr><th>Lifestyle</th><th>Weekly</th><th>Monthly</th><th>Annual</th></tr>'+scen.map(s=>`<tr class="${s.n==='Regular'?'hl':''}"><td>${s.n}</td><td>${money(s.wk)}</td><td>${money(s.mo)}</td><td>${money(s.yr)}</td></tr>`).join('');
+}
+function svState(){return {d:P.d,w:P.w,p:P.p,o:P.o,disc:0}}
+const svYr=s=>Math.max(0,s.d*s.p+s.o-s.disc)*s.w*52;
+function rSav(){
+  const base=svState(),b=svYr(base);
+  const items=svOpts.map(o=>({n:o.n,v:Math.max(0,b-svYr(o.f(base))),cls:S.sv[o.id]?'good':'mute'}));
+  let st=svState();svOpts.forEach(o=>{if(S.sv[o.id])st=o.f(st)});
+  const after=svYr(st),saved=Math.max(0,b-after);
+  $('svBars').innerHTML=barRows(items,{max:Math.max(1,...items.map(i=>i.v)),fmt:v=>money(v)});
+  $('svOut').innerHTML=kv('You would save',money(saved),'per year, ticked changes combined')+kv('New yearly spend',money(after),`down from ${money(b)}`)+kv('Saved per month',money(saved/12))+kv('Share of your tab',b?Math.round(saved/b*100)+'%':'0%');
+}
+function rProj(){
+  const N=S.pY,i=S.pI/100,r=S.pR/100,a=[[0,0]],c=[[0,0]];let cum=0,fv=0;
+  for(let k=1;k<=N;k++){const sp=yr()*Math.pow(1+i,k-1);cum+=sp;fv=fv*(1+r)+sp;a.push([k,cum]);c.push([k,fv]);}
+  $('o-pY').textContent=plural(N,'year');$('o-pI').textContent=S.pI.toFixed(1)+'%';$('o-pR').textContent=S.pR.toFixed(1)+'%';
+  const yt=niceTicks(Math.max(cum,fv,1),4),xt=[];for(let k=0;k<=N;k+=(N>6?2:1))xt.push(k);
+  lineChart($('projChart'),{label:`Cumulative spending over ${N} years against the same money invested`,x0:0,x1:N,y0:0,y1:yt[yt.length-1],xt,yt,yf:v=>P.cur==='EUR'?'€'+nf(v/RATE):(v>=1000?nf(v/1000)+'k':nf(v)),
+    series:[{c:'--amber',pts:a,dots:false,end:'Spent'},{c:'--good',pts:c,dots:false,end:'Invested'}]});
+  $('projOut').innerHTML=kv(`Spent in ${plural(N,'year')}`,money(cum),`first year ${money(yr())}`)+kv('Same money invested',money(fv),`at ${S.pR.toFixed(1)}% a year`)+kv('Growth on top',money(Math.max(0,fv-cum)),'what investing would add')+kv(`Year ${N} bill`,money(yr()*Math.pow(1+i,N-1)),`at ${S.pI.toFixed(1)}% inflation`);
+}
+/* ---------- happy hours ---------- */
+const r=(a,b)=>{const o=[];for(let i=a;i<=b;i++)o.push(i);return o};
+const DAYS=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+const DAYL=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+const tm=s=>{const a=s.split(':');return +a[0]*60+ +a[1]};
+const wEnd=w=>{const f=tm(w.f),t=tm(w.t);return t<=f?t+1440:t};
+const SRC={
+ bav:['bavsevpraze.cz','https://bavsevpraze.cz/happy-hours'],
+ dej:['Déjávu site','https://www.dejavubar.cz/en/happy-hour/'],
+ pit:['The Pitch site','https://www.thepitch.cz/article.php?k=hh_info&lang=en'],
+ hrc:['Hard Rock site','https://cafe.hardrock.com/prague/'],
+ prg:['Praguest','https://www.praguest.com/en/2130-happy-hours-at-hard-rock-cafe-prague'],
+ sli:['Slivovitz Museum site','https://www.slivovitzmuseum.com/easter-menu/'],
+ sbl:['Spotted by Locals','https://spottedbylocals.com/prague/ananas-bananas'],
+ got:['GoOut','https://goout.net/de/alibi-cocktail-and-music-bar/vzxhbb/'],
+ bpg:['Best Prague Guide','https://bestpragueguide.com/en/blog/prague-happy-hour']};
+const CONF={venue:'Venue site',guide:'Local guide',listing:'Listing only',conflict:'Sources differ'};
+const hh=[
+ {n:'Déjávu Music Bar',a:'Praha 1',ad:'Jakubská 648/6',ty:'Music bar',c:'conflict',p:null,src:['dej','bav'],
+  note:`Its own page says every day, 18:00–20:00, and lists no prices. A listing says Tuesday to Sunday with 50% off. Shown here as Tuesday to Sunday.`,
+  w:[{d:r(1,6),f:'18:00',t:'20:00',x:'All cocktails 50% off'}]},
+ {n:'The Pitch',a:'Praha 2',ad:'Ječná 12',ty:'Cocktail bar and club',c:'venue',p:null,src:['pit','bav'],
+  note:`Its own page says Monday to Friday. A listing says daily, and adds cocktails at 99 Kč every evening until midnight. Club nights have a second happy hour, 22:00–23:00 on selected events: chupito 30 Kč, three cocktails 99 Kč.`,
+  w:[{d:r(0,4),f:'17:00',t:'20:00',x:'50% off cocktails'}]},
+ {n:'Hard Rock Cafe Praha',a:'Praha 1',ad:'Malé náměstí 142/3',ty:'Bar and restaurant',c:'venue',p:null,src:['hrc','prg','bav'],
+  note:`Three sources agree on the times. None gives prices. The menu file is named "50 percent off", but the page text does not confirm a discount.`,
+  w:[{d:r(0,3),f:'17:00',t:'19:00',x:'Beer, local wine, selected shots and cocktails at reduced prices'},{d:r(0,3),f:'21:00',t:'22:00',x:'Beer, local wine, selected shots and cocktails at reduced prices'}]},
+ {n:'Slivovitz Museum',a:'Praha 1',ad:'U Lužického semináře 116',ty:'Museum bar',c:'venue',p:125,src:['sli'],
+  note:`Found on the venue's menu page, which may be seasonal. Deal cocktails: Hugo Spritz, Sweet and Spicy, Cherry Spritz, Plum Cocktail and Boston.`,
+  w:[{d:r(0,6),f:'15:00',t:'17:00',x:'Selected cocktails 125 Kč'}]},
+ {n:'Ananas Bananas',a:'Praha 3, Žižkov',ad:'Seifertova 20',ty:'Cocktail bar',c:'guide',p:77,src:['sbl'],
+  note:`Two pages from Spotted by Locals agree on the price. The one dated 19 April 2025 gives the 16:00–20:00 window. The guide calls it probably the cheapest cocktail in Prague.`,
+  w:[{d:r(0,6),f:'16:00',t:'20:00',x:'Cocktails 77 Kč'}]},
+ {n:'ALIBI Cocktail & Music Bar',a:'Praha 1',ad:'Žitná 1575/49',ty:'Cocktail bar',c:'conflict',p:109,src:['bav','got'],
+  note:`A ticketing page for the bar says 18:00–20:00, "selected cocktails for 59", with no currency. A listing says Thursday to Saturday 19:00–21:00 at 109 Kč, plus 1+1 on Wednesday. Shown here as the listing says.`,
+  w:[{d:r(3,5),f:'19:00',t:'21:00',x:'Cocktails 109 Kč'},{d:[2],f:'19:00',t:'02:00',x:'1+1 free drink'}]},
+ {n:'Zone Cocktail & Music Bar',a:'Praha 1',ad:'Křemencova 178/10',ty:'Cocktail bar',c:'listing',p:99,src:['bav'],note:'',
+  w:[{d:r(2,5),f:'18:00',t:'21:00',x:'Selected cocktails 99 Kč'}]},
+ {n:'Nebe Celnice',a:'Praha 1',ad:'V Celnici 4',ty:'Cocktail and music bar',c:'listing',p:99,src:['bav'],note:'',
+  w:[{d:r(0,5),f:'18:00',t:'23:00',x:'Cocktails from 99 Kč. Chupito 1+1 for 99 Kč'}]},
+ {n:'Nebe Bělehradská',a:'Praha 2',ad:'Bělehradská 234/120',ty:'Cocktail and music bar',c:'listing',p:99,src:['bav'],note:'',
+  w:[{d:r(0,5),f:'18:00',t:'23:00',x:'Cocktails from 99 Kč. Chupito 1+1 for 99 Kč'}]},
+ {n:'La Bodeguita Del Medio',a:'Praha 1',ad:'Kaprova 5',ty:'Music bar',c:'listing',p:99,src:['bav'],note:'',
+  w:[{d:[2,3],f:'19:00',t:'23:00',x:'Selected music-bar cocktails 99 Kč'}]},
+ {n:'Aloha Bar',a:'Praha 1',ad:'Dušní 11',ty:'Cocktail bar',c:'listing',p:99,src:['bav'],note:'',
+  w:[{d:r(2,5),f:'19:00',t:'22:00',x:'Cocktails from 99 Kč'},{d:r(2,5),f:'19:00',t:'24:00',x:'Ladies night, cocktails from 99 Kč'}]},
+ {n:'Hangar',a:'Praha 1',ad:'Dušní 9',ty:'Cocktail bar',c:'listing',p:99,src:['bav'],note:'',
+  w:[{d:r(2,5),f:'19:00',t:'22:00',x:'Cocktails from 99 Kč'}]},
+ {n:'Kavárna Velryba',a:'Praha 1',ad:'Opatovická 156/24',ty:'Café bar',c:'listing',p:99,src:['bav'],note:'',
+  w:[{d:r(0,5),f:'15:00',t:'18:00',x:'Drinks 99 Kč'}]},
+ {n:'Station Anděl',a:'Praha 5',ad:'Lidická 798/19',ty:'Bar',c:'listing',p:null,src:['bav'],note:'',
+  w:[{d:r(0,6),f:'15:00',t:'18:00',x:'Cocktails under 100 Kč'}]},
+ {n:'OPSO Shisha Lounge Bar',a:'Praha 3',ad:'Seifertova 617/26',ty:'Lounge bar',c:'listing',p:99,src:['bav'],
+  note:'The listing also prices a hookah at 349 Kč.',
+  w:[{d:r(0,6),f:'16:00',t:'20:00',x:'Cocktails 99 Kč'}]},
+ {n:`Cafe 80's`,a:'Praha 1',ad:'V Kolkovně 909/6',ty:'Bar',c:'listing',p:90,src:['bav'],
+  note:'Ground floor only.',
+  w:[{d:[6,0,1,2,3],f:'17:00',t:'23:00',x:'Cocktails from 90 Kč'}]},
+ {n:'Rossopomodoro Vinohrady',a:'Praha 2',ad:'Krkonošská 17',ty:'Restaurant',c:'listing',p:null,src:['bav'],note:'',
+  w:[{d:r(0,4),f:'16:00',t:'18:00',x:'Two cocktails for the price of one'}]},
+ {n:'Bistro U dvou kamarádů',a:'Praha 10',ad:'Moskevská 342/20',ty:'Bistro',c:'listing',p:null,src:['bav'],
+  note:'The listing says the deal runs all day on Sunday, with no start time. It excludes beer, bottled spirits and Radlík.',
+  w:[{d:r(0,6),f:'16:00',t:'21:00',x:'1+1 on most wine, cocktails and prosecco'}]},
+ {n:'Pivovar U Supa',a:'Praha 1',ad:'Celetná 563/22',ty:'Brewery pub',c:'listing',p:null,src:['bav'],note:'',
+  w:[{d:r(0,6),f:'14:00',t:'17:00',x:'Free half-litre beer with a roast pork knuckle'}]}
+];
+const hhInc=[
+ {n:'Kayak Beach Bar',w:'Náplavka, Praha 2. Cocktails 125 Kč, daily until 21:00. The start time is not stated.',s:'bav'},
+ {n:'Vinohradský pivovar',w:'Korunní 106, Praha 2. House lager 39 Kč instead of 65 Kč, 14:00–17:00. The days are not stated.',s:'bpg'},
+ {n:`Bukowski's Bar`,w:'Bořivojova 86, Praha 3. Half litre of Kozel or Staropramen about 35 Kč, 15:00–17:00. The days are not stated.',s:'bpg'}
+];
+const HH={day:0,open:false,conf:false};
+function pragueNow(){
+  try{
+    const z='Europe/Prague',d=new Date();
+    const dn=new Intl.DateTimeFormat('en-US',{timeZone:z,weekday:'long'}).format(d);
+    const p=new Intl.DateTimeFormat('en-GB',{timeZone:z,hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(d);
+    const g=t=>+p.find(x=>x.type===t).value;
+    return {day:Math.max(0,DAYL.indexOf(dn)),min:g('hour')*60+g('minute')};
+  }catch(e){const d=new Date();return {day:(d.getDay()+6)%7,min:d.getHours()*60+d.getMinutes()}}
+}
+const hhRows=()=>hh.flatMap(v=>v.w.map(w=>[v.n,v.a,v.ad,v.ty,CONF[v.c],w.d.map(i=>DAYS[i]).join(' '),w.f,w.t,w.x]));
+function rHappy(){
+  const now=pragueNow(),day=HH.day,isToday=day===now.day;
+  const hm=m=>String(Math.floor(m/60)%24).padStart(2,'0')+':'+String(m%60).padStart(2,'0');
+  document.querySelectorAll('#hhDays .chip').forEach((b,i)=>b.classList.toggle('on',i===day));
+  const own=v=>v.w.filter(w=>w.d.includes(day)).map(w=>({f:tm(w.f),t:wEnd(w),fs:w.f,ts:w.t,x:w.x}));
+  const spill=v=>v.w.filter(w=>w.d.includes((day+6)%7)&&wEnd(w)>1440).map(w=>({f:0,t:wEnd(w)-1440}));
+  let base=hh.map(v=>({v,ws:own(v).sort((a,b)=>a.f-b.f),sp:spill(v)})).filter(x=>x.ws.length);
+  if(HH.conf)base=base.filter(x=>x.v.c==='venue');
+  const live=x=>isToday&&(x.ws.some(w=>now.min>=w.f&&now.min<w.t)||x.sp.some(w=>now.min>=w.f&&now.min<w.t));
+  const rows=(HH.open?base.filter(live):base).sort((a,b)=>a.ws[0].f-b.ws[0].f);
+
+  const hours=r(12,23),counts=hours.map(h=>base.filter(x=>x.ws.some(w=>w.f<(h+1)*60&&w.t>h*60)).length);
+  const mx=Math.max(1,...counts),peak=Math.max(...counts),peakH=hours[counts.indexOf(peak)],nowH=isToday?Math.floor(now.min/60):-1;
+  $('hhChart').innerHTML=`<div class="hh-chart" role="img" aria-label="Number of places with a happy hour in each hour of ${DAYL[day]}, from 12:00 to 24:00">${hours.map((h,i)=>`<div class="hh-col${h===nowH?' now':''}"><b>${counts[i]}</b><i style="height:${Math.round(counts[i]/mx*110)}px"></i></div>`).join('')}</div><div class="hh-ax">${hours.map(h=>`<span>${h}</span>`).join('')}</div>`;
+  $('hhSum').textContent=`${DAYL[day]}: ${base.length} of ${hh.length} listed places have a happy hour${peak?`, most at ${hm(peakH*60)} (${peak} places)`:''}. It is ${DAYL[now.day]} ${hm(now.min)} in Prague.`;
+
+  $('hhListTitle').textContent=HH.open?`Running now, ${DAYL[day]} ${hm(now.min)} (${rows.length})`:`${DAYL[day]} (${rows.length})`;
+  $('hhList').innerHTML=rows.length?rows.map(x=>{
+    const v=x.v,deals=[...new Set(x.ws.map(w=>w.x))],multi=x.ws.length>1&&deals.length>1;
+    const dealHtml=multi?x.ws.map(w=>`<span>${w.fs}–${w.ts}: ${w.x}</span>`).join(''):deals.map(d=>`<span>${d}</span>`).join('');
+    return `<div class="hh-row"><div class="hh-time">${x.ws.map(w=>`<span>${w.fs}–${w.ts}</span>`).join('')}${live(x)?'<span class="live">On now</span>':''}</div><div><div class="hh-name">${v.n}</div><div class="hh-meta">${v.ty}, ${v.a}, ${v.ad}</div><div class="hh-deal">${dealHtml}</div>${v.note?`<p class="hh-note">${v.note}</p>`:''}</div><div><span class="badge b-${v.c}">${CONF[v.c]}</span><div class="hh-src">${v.src.map(k=>`<a href="${SRC[k][1]}" target="_blank" rel="noopener">${SRC[k][0]}</a>`).join('')}</div></div></div>`}).join('')
+   :`<p class="cap" style="margin:0">${HH.open?'No listed place has a happy hour running right now. Try another day.':'No listed place has a happy hour on this day with these filters.'}</p>`;
+
+  const ps=hh.filter(v=>v.p!=null).map(v=>v.p),min=Math.min(...ps),cheap=hh.find(v=>v.p===min);
+  const cnt={};ps.forEach(p=>cnt[p]=(cnt[p]||0)+1);
+  const mode=+Object.keys(cnt).sort((a,b)=>cnt[b]-cnt[a]||a-b)[0];
+  $('hhStats').innerHTML=kv('Venues listed',hh.length,`plus ${hhInc.length} with incomplete times`)+kv('Confirmed on venue site',hh.filter(v=>v.c==='venue').length,`of ${hh.length} listed`)+kv('Cheapest cocktail',money(min),cheap.n)+kv('Most common price',money(mode),`quoted by ${cnt[mode]} venues`);
+  const ladder=hh.filter(v=>v.p!=null).sort((a,b)=>a.p-b.p).map(v=>({n:v.n,v:v.p,cls:v.c==='venue'?'good':v.c==='conflict'?'hot':''}));
+  ladder.push({n:'Craft bar, normal price',note:'Midpoint of 220–300 Kč',v:260,cls:'mute'});
+  $('hhLadder').innerHTML=barRows(ladder,{max:280,fmt:v=>money(v)});
+  $('hhInc').innerHTML=hhInc.map(v=>`<li><b style="color:var(--text);font-weight:600">${v.n}.</b> ${v.w} <a href="${SRC[v.s][1]}" target="_blank" rel="noopener">${SRC[v.s][0]}</a></li>`).join('');
+}
+
+function syncProfile(){
+  $('i-d').value=P.d;$('i-p').value=P.p;$('i-w').value=P.w;$('i-o').value=P.o;
+  $('o-d').textContent=P.d;$('o-p').textContent=money(P.p);$('o-w').textContent=P.w;
+  document.querySelectorAll('#presets .chip').forEach((b,i)=>{const s=scen[i];b.classList.toggle('on',s.d===P.d&&s.w===P.w&&s.p===P.p&&P.o===0)});
+  document.querySelectorAll('#drinkChips .chip').forEach((b,i)=>b.classList.toggle('on',drinks[i].avg===P.p));
+  document.querySelectorAll('#curChips .chip').forEach(b=>b.classList.toggle('on',b.dataset.c===P.cur));
+}
+function renderAll(){syncProfile();rCoaster();rKpis();rFindings();rPrices();rAreas();rCock();rHappy();rClubs();rNights();rTour();rTrend();rScen();rSav();rProj()}
+
+/* ---------- export ---------- */
+function csv(){
+  const sec=(h,rows)=>h+'\n'+rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const nt=nightTotals();
+  return [
+    sec('Drink,Average_Price_CZK,Low_CZK,High_CZK',drinks.map(d=>[d.n,d.avg,d.lo,d.hi])),
+    sec('Lifestyle,Drinks_Per_Night,Nights_Per_Week,Price_Per_Drink,Weekly_CZK,Monthly_CZK,Annual_CZK',scen.map(s=>[s.n,s.d,s.w,s.p,s.wk,s.mo,s.yr])),
+    sec('Area,Beer_Low_CZK,Beer_High_CZK,Midpoint_CZK',areas.map(a=>[a.n,a.lo,a.hi,a.mid])),
+    sec('Cocktail_Bar_Type,Low_CZK,High_CZK',cocktails.map(c=>[c.n,c.lo,c.hi])),
+    sec('Club,Entrance_Low_CZK,Entrance_High_CZK,Note',clubs.map(c=>[c.n,c.lo,c.hi,c.note])),
+    sec('Modelled_Night,Assumptions,Total_CZK',nt.map(n=>[n.n,n.desc,n.total])),
+    sec('Venue,Area,Address,Type,Confirmation,Days,From,To,Deal',hhRows()),
+    sec('Year,Prague_Draught_Beer_CZK',trend)
+  ].join('\n\n');
+}
+function json(){
+  return JSON.stringify({exchange_rate_czk_per_eur:RATE,weeks_per_month:WPM,
+    drinks:drinks.map(d=>({drink:d.n,average_czk:d.avg,low_czk:d.lo,high_czk:d.hi})),
+    scenarios:scen.map(s=>({lifestyle:s.n,drinks_per_night:s.d,nights_per_week:s.w,price_per_drink:s.p,weekly_czk:s.wk,monthly_czk:s.mo,annual_czk:s.yr})),
+    beer_by_area:areas.map(a=>({area:a.n,low_czk:a.lo,high_czk:a.hi,midpoint_czk:a.mid})),
+    cocktails_by_bar_type:cocktails.map(c=>({type:c.n,low_czk:c.lo,high_czk:c.hi})),
+    club_entrance:clubs.map(c=>({venue:c.n,low_czk:c.lo,high_czk:c.hi,note:c.note})),
+    modelled_nights:nightTotals().map(n=>({night:n.n,assumptions:n.desc,total_czk:n.total})),
+    happy_hours:hhRows().map(a=>({venue:a[0],area:a[1],address:a[2],type:a[3],confirmation:a[4],days:a[5],from:a[6],to:a[7],deal:a[8]})),
+    prague_draught_beer_price_czk:trend.map(t=>({year:t[0],price_czk:t[1]}))},null,2);
+}
+async function copyOut(kind){
+  const t=kind==='json'?json():csv(),out=$('exOut');
+  out.value=t;out.hidden=false;
+  try{await navigator.clipboard.writeText(t);$('exMsg').textContent='Copied the '+kind.toUpperCase()+' to your clipboard.'}
+  catch(e){out.focus();out.select();$('exMsg').textContent='Select the text below and copy it.'}
+}
+
+/* ---------- init ---------- */
+(function init(){
+  $('nav').innerHTML=sections.map(s=>`<li><a href="#${s[0]}">${s[1]}</a></li>`).join('');
+  $('presets').innerHTML=scen.map((s,i)=>`<button type="button" class="chip" data-i="${i}">${s.n}</button>`).join('');
+  $('drinkChips').innerHTML=drinks.map((d,i)=>`<button type="button" class="chip" data-i="${i}">${d.n}</button>`).join('');
+  $('curChips').innerHTML=['CZK','EUR'].map(c=>`<button type="button" class="chip" data-c="${c}">${c}</button>`).join('');
+  $('areaA').innerHTML=$('areaB').innerHTML=areas.map((a,i)=>`<option value="${i}">${a.n}</option>`).join('');
+  $('areaA').value=S.areaA;$('areaB').value=S.areaB;
+  $('clubSel').innerHTML=clubs.map((c,i)=>`<option value="${i}">${c.n}</option>`).join('');$('clubSel').value=S.club;
+  $('svList').innerHTML=svOpts.map(o=>`<label><input type="checkbox" id="${o.id}" ${S.sv[o.id]?'checked':''}>${o.n}</label>`).join('');
+
+  $('presets').addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b)return;const s=scen[+b.dataset.i];P.d=s.d;P.w=s.w;P.p=s.p;P.o=0;renderAll()});
+  $('drinkChips').addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b)return;P.p=Math.round(drinks[+b.dataset.i].avg/5)*5===drinks[+b.dataset.i].avg?drinks[+b.dataset.i].avg:drinks[+b.dataset.i].avg;renderAll()});
+  $('curChips').addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b)return;P.cur=b.dataset.c;renderAll()});
+  $('i-d').addEventListener('input',e=>{P.d=+e.target.value;renderAll()});
+  $('i-p').addEventListener('input',e=>{P.p=+e.target.value;renderAll()});
+  $('i-w').addEventListener('input',e=>{P.w=+e.target.value;renderAll()});
+  $('i-o').addEventListener('input',e=>{P.o=Math.max(0,+e.target.value||0);renderAll()});
+
+  $('hhT').addEventListener('change',e=>{S.hhT=e.target.value;rCock()});
+  $('hhN').addEventListener('input',e=>{S.hhN=+e.target.value;rCock()});
+  $('hhDays').innerHTML=DAYS.map((d,i)=>`<button type="button" class="chip" data-i="${i}" aria-label="${DAYL[i]}">${d}</button>`).join('');
+  HH.day=pragueNow().day;
+  $('hhDays').addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b)return;HH.day=+b.dataset.i;HH.open=false;$('hhNow').checked=false;rHappy()});
+  $('hhNow').addEventListener('change',e=>{HH.open=e.target.checked;if(HH.open)HH.day=pragueNow().day;rHappy()});
+  $('hhConf').addEventListener('change',e=>{HH.conf=e.target.checked;rHappy()});
+  $('clubSel').addEventListener('change',e=>{S.club=+e.target.value;rClubs()});
+  $('clubM').addEventListener('input',e=>{S.clubM=+e.target.value;rClubs()});
+  $('tip').addEventListener('input',e=>{S.tip=+e.target.value;rNights()});
+  $('areaA').addEventListener('change',e=>{S.areaA=+e.target.value;rTour()});
+  $('areaB').addEventListener('change',e=>{S.areaB=+e.target.value;rTour()});
+  svOpts.forEach(o=>$(o.id).addEventListener('change',e=>{S.sv[o.id]=e.target.checked;rSav()}));
+  $('pY').addEventListener('input',e=>{S.pY=+e.target.value;rProj()});
+  $('pI').addEventListener('input',e=>{S.pI=+e.target.value;rProj()});
+  $('pR').addEventListener('input',e=>{S.pR=+e.target.value;rProj()});
+  $('cpCsv').addEventListener('click',()=>copyOut('csv'));
+  $('cpJson').addEventListener('click',()=>copyOut('json'));
+
+  renderAll();
+
+  let t;window.addEventListener('resize',()=>{clearTimeout(t);t=setTimeout(()=>{rTrend();rProj()},120)});
+  try{
+    const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){document.querySelectorAll('#nav a').forEach(a=>a.classList.toggle('on',a.getAttribute('href')==='#'+e.target.id))}})},{rootMargin:'-30% 0px -65% 0px'});
+    document.querySelectorAll('.sec').forEach(s=>io.observe(s));
+  }catch(e){}
+  const first=document.querySelector('#nav a');if(first)first.classList.add('on');
+})();
+</script>
+</body>
+</html>
